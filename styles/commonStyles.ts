@@ -1,14 +1,34 @@
+
 import { StyleSheet, ViewStyle, TextStyle } from 'react-native';
 
 export const colors = {
-  primary: '#162456',    // Material Blue
-  secondary: '#193cb8',  // Darker Blue
-  accent: '#64B5F6',     // Light Blue
-  background: '#101824',  // Keeping dark background
-  backgroundAlt: '#162133',  // Keeping dark background
-  text: '#e3e3e3',       // Keeping light text
-  grey: '#90CAF9',       // Light Blue Grey
-  card: '#193cb8',       // Keeping dark card background
+  // Finance Dashboard Theme
+  background: '#0C1A12',
+  backgroundAlt: '#162133',
+  text: '#FFFFFF',
+  subtextGray: '#A7A7A7',
+  green: '#2EFF8B',
+  red: '#FF4D4D',
+  yellow: '#FFC247',
+  
+  // Legacy colors for compatibility
+  primary: '#162456',
+  secondary: '#193cb8',
+  accent: '#64B5F6',
+  grey: '#90CAF9',
+  card: '#193cb8',
+};
+
+export const financeTheme = {
+  cornerRadius: 16,
+  spacing: 8,
+  cardPadding: 16,
+  shadow: {
+    shadowColor: '#000000',
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+  },
 };
 
 export const buttonStyles = StyleSheet.create({

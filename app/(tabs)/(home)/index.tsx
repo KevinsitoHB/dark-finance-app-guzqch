@@ -1,33 +1,32 @@
-import React from "react";
-import { FlatList, StyleSheet, View } from "react-native";
-import { useTheme } from "@react-navigation/native";
-import { modalDemos } from "@/components/homeData";
-import { DemoCard } from "@/components/DemoCard";
+
+import React from 'react';
+import { ScrollView, StyleSheet, Platform } from 'react-native';
+import CustomHeader from '@/components/CustomHeader';
+import FinancialOverview from '@/components/FinancialOverview';
+import BudgetBreakdown from '@/components/BudgetBreakdown';
+import { colors } from '@/styles/commonStyles';
 
 export default function HomeScreen() {
-  const theme = useTheme();
-
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <FlatList
-        data={modalDemos}
-        renderItem={({ item }) => <DemoCard item={item} />}
-        keyExtractor={(item) => item.route}
-        contentContainerStyle={styles.listContainer}
-        contentInsetAdjustmentBehavior="automatic"
-        showsVerticalScrollIndicator={false}
-      />
-    </View>
+    <ScrollView 
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
+    >
+      <CustomHeader title="Dashboard" />
+      <FinancialOverview />
+      <BudgetBreakdown />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
+    paddingTop: Platform.OS === 'android' ? 48 : 0,
   },
-  listContainer: {
-    paddingTop: 48,
-    paddingHorizontal: 16,
-    paddingBottom: 100, // Extra padding for floating tab bar
+  contentContainer: {
+    paddingBottom: 20,
   },
 });
