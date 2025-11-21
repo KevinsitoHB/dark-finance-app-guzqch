@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import CustomHeader from '@/components/CustomHeader';
 import FinancialOverview from '@/components/FinancialOverview';
 import BudgetBreakdown from '@/components/BudgetBreakdown';
+import MonthlyCalendar from '@/components/MonthlyCalendar';
 import { colors } from '@/styles/commonStyles';
 
 export default function HomeScreen() {
@@ -17,6 +18,7 @@ export default function HomeScreen() {
         <CustomHeader title="Dashboard" />
         <FinancialOverview />
         <BudgetBreakdown />
+        <MonthlyCalendar />
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </View>
