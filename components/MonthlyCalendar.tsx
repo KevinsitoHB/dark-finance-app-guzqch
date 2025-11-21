@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '@/styles/commonStyles';
 
 interface CalendarDay {
@@ -50,7 +50,7 @@ export default function MonthlyCalendar() {
         <View style={styles.monthHeader}>
           <Text style={styles.monthTitle}>{monthName}</Text>
           <View style={[styles.badge, isCurrent ? styles.currentBadge : styles.nextBadge]}>
-            <Text style={styles.badgeText}>{isCurrent ? 'Current' : 'Next'}</Text>
+            <Text style={styles.badgeText}>{isCurrent ? 'CURRENT' : 'NEXT'}</Text>
           </View>
         </View>
 
@@ -86,15 +86,9 @@ export default function MonthlyCalendar() {
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        pagingEnabled
-      >
-        {renderMonth(currentMonth, true)}
-        {renderMonth(nextMonth, false)}
-      </ScrollView>
+      <Text style={styles.sectionTitle}>Payment Calendar</Text>
+      {renderMonth(currentMonth, true)}
+      {renderMonth(nextMonth, false)}
     </View>
   );
 }
@@ -105,16 +99,20 @@ const styles = StyleSheet.create({
     marginTop: 24,
     paddingHorizontal: 16,
   },
-  scrollContent: {
-    gap: 16,
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 16,
   },
   monthCard: {
-    width: 340,
+    width: '100%',
     backgroundColor: 'rgba(42, 42, 42, 0.4)',
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(74, 144, 226, 0.1)',
     padding: 16,
+    marginBottom: 16,
   },
   monthHeader: {
     flexDirection: 'row',
@@ -142,6 +140,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: colors.text,
+    textTransform: 'uppercase',
   },
   weekDaysRow: {
     flexDirection: 'row',
