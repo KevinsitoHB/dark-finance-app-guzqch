@@ -78,8 +78,7 @@ export default function FixedBillsScreen() {
   };
 
   const handleAdd = () => {
-    // Navigate to add bill screen (to be implemented)
-    Alert.alert('Add Bill', 'Add bill screen coming soon');
+    router.push('/(tabs)/add-bill');
   };
 
   const handleCopyExport = () => {

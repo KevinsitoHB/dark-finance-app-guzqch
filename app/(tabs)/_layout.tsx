@@ -21,13 +21,13 @@ export default function TabLayout() {
     {
       name: 'planning',
       route: '/(tabs)/planning',
-      icon: 'event_note',
+      icon: 'lightbulb',
       label: 'Planning',
     },
     {
       name: 'accounts',
       route: '/(tabs)/accounts',
-      icon: 'account_balance',
+      icon: 'account_balance_wallet',
       label: 'Accounts',
     },
     {
@@ -55,6 +55,13 @@ export default function TabLayout() {
         <Stack.Screen 
           key="edit-bill" 
           name="edit-bill"
+          options={{
+            presentation: 'card',
+          }}
+        />
+        <Stack.Screen 
+          key="add-bill" 
+          name="add-bill"
           options={{
             presentation: 'card',
           }}

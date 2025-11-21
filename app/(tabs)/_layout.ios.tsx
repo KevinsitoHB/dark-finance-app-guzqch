@@ -60,7 +60,7 @@ export default function TabLayout() {
         options={{
           title: 'Planning',
           tabBarIcon: ({ color }) => ({
-            sfSymbol: 'calendar',
+            sfSymbol: 'lightbulb.fill',
             hierarchicalColor: color,
           }),
         }}
@@ -70,7 +70,7 @@ export default function TabLayout() {
         options={{
           title: 'Accounts',
           tabBarIcon: ({ color }) => ({
-            sfSymbol: 'building.columns.fill',
+            sfSymbol: 'creditcard.fill',
             hierarchicalColor: color,
           }),
         }}
@@ -87,6 +87,12 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="edit-bill"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="add-bill"
         options={{
           href: null,
         }}
