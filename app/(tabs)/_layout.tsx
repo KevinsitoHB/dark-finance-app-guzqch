@@ -52,6 +52,13 @@ export default function TabLayout() {
         <Stack.Screen key="planning" name="planning" />
         <Stack.Screen key="accounts" name="accounts" />
         <Stack.Screen key="myaccount" name="myaccount" />
+        <Stack.Screen 
+          key="edit-bill" 
+          name="edit-bill"
+          options={{
+            presentation: 'card',
+          }}
+        />
       </Stack>
       <FloatingTabBar tabs={tabs} />
     </>

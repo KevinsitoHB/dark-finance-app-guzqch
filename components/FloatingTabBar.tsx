@@ -60,7 +60,7 @@ export default function FloatingTabBar({ tabs }: FloatingTabBarProps) {
         <GlassView 
           glassEffectStyle="regular" 
           style={styles.glassContainer}
-          tintColor="rgba(12, 26, 18, 0.7)"
+          tintColor="rgba(12, 26, 18, 0.85)"
         >
           <View style={styles.borderTop} />
           <TabBarContent />
@@ -71,7 +71,8 @@ export default function FloatingTabBar({ tabs }: FloatingTabBarProps) {
 
   return (
     <View style={styles.container}>
-      <BlurView intensity={90} tint="dark" style={styles.blurContainer}>
+      <BlurView intensity={95} tint="dark" style={styles.blurContainer}>
+        <View style={styles.overlay} />
         <View style={styles.borderTop} />
         <TabBarContent />
       </BlurView>
@@ -92,6 +93,11 @@ const styles = StyleSheet.create({
   },
   blurContainer: {
     paddingBottom: Platform.OS === 'ios' ? 24 : 0,
+    position: 'relative',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(12, 26, 18, 0.7)',
   },
   borderTop: {
     position: 'absolute',

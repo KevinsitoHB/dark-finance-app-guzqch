@@ -2,7 +2,7 @@
 import { Tabs } from 'expo-router/unstable-native-tabs';
 import { colors } from '@/styles/commonStyles';
 import { GlassView } from 'expo-glass-effect';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 export default function TabLayout() {
   return (
@@ -16,17 +16,21 @@ export default function TabLayout() {
           borderTopWidth: 0,
           height: 90,
           paddingBottom: 20,
+          elevation: 0,
         },
         tabBarBackground: () => (
-          <GlassView 
-            style={StyleSheet.absoluteFill}
-            glassEffectStyle="regular"
-            tintColor="rgba(12, 26, 18, 0.7)"
-          />
+          <View style={StyleSheet.absoluteFill}>
+            <GlassView 
+              style={StyleSheet.absoluteFill}
+              glassEffectStyle="regular"
+              tintColor="rgba(12, 26, 18, 0.85)"
+            />
+            <View style={styles.borderTop} />
+          </View>
         ),
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
+          fontSize: 11,
+          fontWeight: '600',
         },
         headerShown: false,
       }}
@@ -81,6 +85,23 @@ export default function TabLayout() {
           }),
         }}
       />
+      <Tabs.Screen
+        name="edit-bill"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  borderTop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 0.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+  },
+});

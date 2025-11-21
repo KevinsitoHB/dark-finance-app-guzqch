@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Platform, TouchableOpacity, ScrollView, Alert, Clipboard } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '@/styles/commonStyles';
 import { supabase } from '@/app/integrations/supabase/client';
 
@@ -28,15 +29,13 @@ export default function FixedBillsScreen() {
     fetchBills();
   }, []);
 
-  useEffect(() => {
-    // Refresh bills when screen comes into focus
-    const unsubscribe = router.subscribe(() => {
+  // Use useFocusEffect to refresh bills when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('Fixed Bills screen focused, refreshing data...');
       fetchBills();
-    });
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, []);
+    }, [])
+  );
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
