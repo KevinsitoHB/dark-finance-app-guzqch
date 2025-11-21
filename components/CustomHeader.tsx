@@ -17,14 +17,13 @@ export default function CustomHeader({ title }: CustomHeaderProps) {
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: 60,
-    paddingBottom: 20,
+    paddingTop: 48,
+    paddingBottom: 16,
     paddingHorizontal: 16,
-    backgroundColor: colors.background,
   },
   title: {
-    fontSize: 32,
-    fontWeight: '600',
+    fontSize: 28,
+    fontWeight: '700',
     color: colors.text,
   },
 });

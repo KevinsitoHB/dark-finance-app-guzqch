@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Dark Finance",
-    "slug": "Dark Finance",
+    "name": "SmartCashTrack",
+    "slug": "SmartCashTrack",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/natively-dark.png",
@@ -44,5 +44,5 @@
       "router": {}
     }
   },
-  "scheme": "Dark Finance"
+  "scheme": "SmartCashTrack"
 }

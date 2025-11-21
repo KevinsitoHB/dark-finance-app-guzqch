@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { IconSymbol } from '@/components/IconSymbol';
-import { colors, financeTheme } from '@/styles/commonStyles';
+import { colors } from '@/styles/commonStyles';
 
 interface SummaryCardProps {
   backgroundColor: string;
@@ -25,16 +25,16 @@ export default function SummaryCard({
 }: SummaryCardProps) {
   return (
     <View style={[styles.card, { backgroundColor, borderColor }]}>
-      <View style={[styles.iconCircle, { backgroundColor: `${iconColor}20` }]}>
+      <View style={[styles.iconCircle, { backgroundColor: `${iconColor}30` }]}>
         <IconSymbol
           ios_icon_name={iconName}
           android_material_icon_name={iconName}
-          size={28}
+          size={24}
           color={iconColor}
         />
       </View>
       <Text style={[styles.value, { color: valueColor }]}>{value}</Text>
-      <Text style={styles.subtext}>{subtext}</Text>
+      <Text style={styles.subtext} numberOfLines={2}>{subtext}</Text>
     </View>
   );
 }
@@ -42,33 +42,34 @@ export default function SummaryCard({
 const styles = StyleSheet.create({
   card: {
     width: '48%',
-    height: 160,
-    borderRadius: 20,
-    borderWidth: 2,
-    padding: 16,
-    marginBottom: 12,
+    minHeight: 140,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    padding: 14,
+    marginBottom: 10,
     justifyContent: 'space-between',
     shadowColor: '#000000',
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 6,
   },
   iconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 8,
   },
   value: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginTop: 8,
+    fontSize: 26,
+    fontWeight: '700',
+    marginBottom: 4,
   },
   subtext: {
-    fontSize: 13,
+    fontSize: 11,
     color: colors.subtextGray,
-    lineHeight: 18,
+    lineHeight: 14,
   },
 });
