@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ScrollView, StyleSheet, Platform } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import CustomHeader from '@/components/CustomHeader';
 import FinancialOverview from '@/components/FinancialOverview';
 import BudgetBreakdown from '@/components/BudgetBreakdown';
@@ -8,15 +8,18 @@ import { colors } from '@/styles/commonStyles';
 
 export default function HomeScreen() {
   return (
-    <ScrollView 
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      showsVerticalScrollIndicator={false}
-    >
-      <CustomHeader title="Dashboard" />
-      <FinancialOverview />
-      <BudgetBreakdown />
-    </ScrollView>
+    <View style={styles.container}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <CustomHeader title="Dashboard" />
+        <FinancialOverview />
+        <BudgetBreakdown />
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
+    </View>
   );
 }
 
@@ -24,9 +27,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: Platform.OS === 'android' ? 48 : 0,
   },
-  contentContainer: {
-    paddingBottom: 20,
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 120,
+  },
+  bottomSpacer: {
+    height: 40,
   },
 });

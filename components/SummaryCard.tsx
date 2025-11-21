@@ -7,32 +7,33 @@ import { colors, financeTheme } from '@/styles/commonStyles';
 interface SummaryCardProps {
   backgroundColor: string;
   borderColor: string;
+  iconName: string;
   iconColor: string;
-  iosIconName: string;
-  androidIconName: any;
   value: string;
+  valueColor: string;
   subtext: string;
 }
 
 export default function SummaryCard({
   backgroundColor,
   borderColor,
+  iconName,
   iconColor,
-  iosIconName,
-  androidIconName,
   value,
+  valueColor,
   subtext,
 }: SummaryCardProps) {
   return (
-    <View style={[styles.card, { backgroundColor, borderColor }, financeTheme.shadow]}>
-      <IconSymbol
-        ios_icon_name={iosIconName}
-        android_material_icon_name={androidIconName}
-        size={28}
-        color={iconColor}
-        style={styles.icon}
-      />
-      <Text style={[styles.value, { color: iconColor }]}>{value}</Text>
+    <View style={[styles.card, { backgroundColor, borderColor }]}>
+      <View style={[styles.iconCircle, { backgroundColor: `${iconColor}20` }]}>
+        <IconSymbol
+          ios_icon_name={iconName}
+          android_material_icon_name={iconName}
+          size={28}
+          color={iconColor}
+        />
+      </View>
+      <Text style={[styles.value, { color: valueColor }]}>{value}</Text>
       <Text style={styles.subtext}>{subtext}</Text>
     </View>
   );
@@ -41,21 +42,33 @@ export default function SummaryCard({
 const styles = StyleSheet.create({
   card: {
     width: '48%',
-    height: 140,
+    height: 160,
     borderRadius: 20,
-    borderWidth: 1,
-    padding: 14,
+    borderWidth: 2,
+    padding: 16,
+    marginBottom: 12,
     justifyContent: 'space-between',
+    shadowColor: '#000000',
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 8,
   },
-  icon: {
-    marginBottom: 8,
+  iconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   value: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
+    marginTop: 8,
   },
   subtext: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.subtextGray,
+    lineHeight: 18,
   },
 });

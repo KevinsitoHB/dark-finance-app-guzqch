@@ -9,20 +9,21 @@ interface CustomHeaderProps {
 
 export default function CustomHeader({ title }: CustomHeaderProps) {
   return (
-    <View style={styles.container}>
+    <View style={styles.header}>
       <Text style={styles.title}>{title}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 24,
-    paddingLeft: 16,
-    paddingBottom: 16,
+  header: {
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 16,
+    backgroundColor: colors.background,
   },
   title: {
-    fontSize: 26,
+    fontSize: 32,
     fontWeight: '600',
     color: colors.text,
   },

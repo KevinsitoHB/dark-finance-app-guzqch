@@ -4,6 +4,7 @@ import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native
 import { useRouter, usePathname } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
 import { colors } from '@/styles/commonStyles';
+import { BlurView } from 'expo-blur';
 
 export interface TabBarItem {
   name: string;
@@ -29,28 +30,30 @@ export default function FloatingTabBar({ tabs }: FloatingTabBarProps) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.tabBar}>
-        {tabs.map((tab, index) => {
-          const active = isActive(tab.route);
-          return (
-            <TouchableOpacity
-              key={index}
-              style={styles.tab}
-              onPress={() => router.push(tab.route as any)}
-            >
-              <IconSymbol
-                ios_icon_name={tab.icon}
-                android_material_icon_name={tab.icon}
-                size={24}
-                color={active ? colors.green : colors.subtextGray}
-              />
-              <Text style={[styles.label, { color: active ? colors.green : colors.subtextGray }]}>
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+      <BlurView intensity={80} tint="dark" style={styles.blurContainer}>
+        <View style={styles.tabBar}>
+          {tabs.map((tab, index) => {
+            const active = isActive(tab.route);
+            return (
+              <TouchableOpacity
+                key={index}
+                style={styles.tab}
+                onPress={() => router.push(tab.route as any)}
+              >
+                <IconSymbol
+                  ios_icon_name={tab.icon}
+                  android_material_icon_name={tab.icon}
+                  size={24}
+                  color={active ? colors.green : colors.subtextGray}
+                />
+                <Text style={[styles.label, { color: active ? colors.green : colors.subtextGray }]}>
+                  {tab.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </BlurView>
     </View>
   );
 }
@@ -61,7 +64,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: colors.background,
+    overflow: 'hidden',
+  },
+  blurContainer: {
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
@@ -79,5 +84,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     marginTop: 4,
+    fontWeight: '500',
   },
 });

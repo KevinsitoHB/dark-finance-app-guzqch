@@ -2,7 +2,7 @@
 import { StyleSheet, ViewStyle, TextStyle } from 'react-native';
 
 export const colors = {
-  // Finance Dashboard Theme
+  // Finance Dashboard Theme - Updated to match reference image
   background: '#0C1A12',
   backgroundAlt: '#162133',
   text: '#FFFFFF',
@@ -20,12 +20,12 @@ export const colors = {
 };
 
 export const financeTheme = {
-  cornerRadius: 16,
+  cornerRadius: 20,
   spacing: 8,
   cardPadding: 16,
   shadow: {
     shadowColor: '#000000',
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.3,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
   },

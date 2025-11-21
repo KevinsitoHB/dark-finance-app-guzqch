@@ -1,6 +1,8 @@
 
 import { Tabs } from 'expo-router/unstable-native-tabs';
 import { colors } from '@/styles/commonStyles';
+import { GlassView } from 'expo-glass-effect';
+import { StyleSheet } from 'react-native';
 
 export default function TabLayout() {
   return (
@@ -9,12 +11,22 @@ export default function TabLayout() {
         tabBarActiveTintColor: colors.green,
         tabBarInactiveTintColor: colors.subtextGray,
         tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: 'rgba(255, 255, 255, 0.1)',
-          height: 80,
+          position: 'absolute',
+          backgroundColor: 'transparent',
+          borderTopWidth: 0,
+          height: 90,
+          paddingBottom: 20,
         },
+        tabBarBackground: () => (
+          <GlassView 
+            style={StyleSheet.absoluteFill}
+            glassEffectStyle="regular"
+            tintColor="rgba(12, 26, 18, 0.7)"
+          />
+        ),
         tabBarLabelStyle: {
           fontSize: 12,
+          fontWeight: '500',
         },
         headerShown: false,
       }}
