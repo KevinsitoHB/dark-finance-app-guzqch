@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, Platform, TouchableOpacity, ScrollView, Alert, Clipboard } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { colors } from '@/styles/commonStyles';
 import { supabase } from '@/app/integrations/supabase/client';
 
@@ -9,19 +10,32 @@ interface FixedBill {
   id: number;
   bill_name: string;
   bill_cost: number;
+  due_date: string | null;
   created_at: string;
   user_id: string;
 }
 
 export default function FixedBillsScreen() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'bills' | 'calculators'>('bills');
   const [bills, setBills] = useState<FixedBill[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [sortOrder, setSortOrder] = useState<'high-to-low' | 'low-to-high'>('high-to-low');
 
   useEffect(() => {
     checkAuth();
     fetchBills();
+  }, []);
+
+  useEffect(() => {
+    // Refresh bills when screen comes into focus
+    const unsubscribe = router.subscribe(() => {
+      fetchBills();
+    });
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const checkAuth = async () => {
@@ -50,19 +64,95 @@ export default function FixedBillsScreen() {
   };
 
   const handleSort = () => {
-    Alert.alert('Sort', 'Sort functionality coming soon');
+    const newSortOrder = sortOrder === 'high-to-low' ? 'low-to-high' : 'high-to-low';
+    setSortOrder(newSortOrder);
+    
+    const sortedBills = [...bills].sort((a, b) => {
+      if (newSortOrder === 'high-to-low') {
+        return b.bill_cost - a.bill_cost;
+      } else {
+        return a.bill_cost - b.bill_cost;
+      }
+    });
+    
+    setBills(sortedBills);
   };
 
   const handleAdd = () => {
-    Alert.alert('Add Bill', 'Add bill functionality coming soon');
+    // Navigate to add bill screen (to be implemented)
+    Alert.alert('Add Bill', 'Add bill screen coming soon');
   };
 
   const handleCopyExport = () => {
-    Alert.alert('Export', 'Export functionality coming soon');
+    if (bills.length === 0) {
+      Alert.alert('No Bills', 'There are no bills to export');
+      return;
+    }
+
+    Alert.alert(
+      'Export Bills',
+      'Choose an export option',
+      [
+        {
+          text: 'Copy to Clipboard',
+          onPress: copyToClipboard,
+        },
+        {
+          text: 'Download CSV',
+          onPress: downloadCSV,
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
+
+  const copyToClipboard = () => {
+    let text = 'Fixed Bills\n\n';
+    bills.forEach((bill, index) => {
+      text += `${index + 1}. ${bill.bill_name}\n`;
+      text += `   Amount: $${bill.bill_cost.toFixed(2)}\n`;
+      if (bill.due_date) {
+        text += `   Due Date: ${new Date(bill.due_date).toLocaleDateString()}\n`;
+      }
+      text += '\n';
+    });
+    
+    const total = bills.reduce((sum, bill) => sum + bill.bill_cost, 0);
+    text += `Total: $${total.toFixed(2)}`;
+
+    Clipboard.setString(text);
+    Alert.alert('Success', 'Bills copied to clipboard');
+  };
+
+  const downloadCSV = () => {
+    // CSV download functionality would require expo-file-system
+    Alert.alert('Coming Soon', 'CSV download functionality will be available soon');
+  };
+
+  const handleBillPress = (billId: number) => {
+    router.push(`/(tabs)/edit-bill/${billId}`);
+  };
+
+  const getSortedBills = () => {
+    return [...bills].sort((a, b) => {
+      if (sortOrder === 'high-to-low') {
+        return b.bill_cost - a.bill_cost;
+      } else {
+        return a.bill_cost - b.bill_cost;
+      }
+    });
   };
 
   const renderBillCard = (bill: FixedBill, index: number) => (
-    <View key={index} style={styles.billCard}>
+    <TouchableOpacity
+      key={index}
+      style={styles.billCard}
+      onPress={() => handleBillPress(bill.id)}
+      activeOpacity={0.7}
+    >
       <View style={styles.billIconContainer}>
         <View style={styles.billIcon}>
           <Ionicons name="receipt-outline" size={24} color="#FF6B6B" />
@@ -73,14 +163,22 @@ export default function FixedBillsScreen() {
       </View>
       <View style={styles.billContent}>
         <Text style={styles.billName}>{bill.bill_name || 'Unnamed Bill'}</Text>
-        <Text style={styles.billType}>Fixed Bill</Text>
+        <Text style={styles.billType}>
+          {bill.due_date 
+            ? `Due: ${new Date(bill.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+            : 'Fixed Bill'
+          }
+        </Text>
       </View>
       <View style={styles.billAmountContainer}>
         <Text style={styles.billAmount}>${bill.bill_cost?.toFixed(2) || '0.00'}</Text>
-        <Text style={styles.billLabel}>Balance</Text>
+        <Text style={styles.billLabel}>Amount</Text>
       </View>
-    </View>
+      <Ionicons name="chevron-forward" size={20} color="#666666" style={styles.chevron} />
+    </TouchableOpacity>
   );
+
+  const displayedBills = getSortedBills();
 
   return (
     <View style={styles.container}>
@@ -89,22 +187,6 @@ export default function FixedBillsScreen() {
         <Text style={styles.navbarTitle}>Fixed Bills</Text>
         {isLoggedIn && (
           <View style={styles.navbarIcons}>
-            {bills.length > 0 && (
-              <TouchableOpacity 
-                style={styles.iconButton} 
-                onPress={handleSort}
-                hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
-              >
-                <Ionicons name="swap-vertical" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity 
-              style={styles.iconButton} 
-              onPress={handleAdd}
-              hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
-            >
-              <Ionicons name="add" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
             <TouchableOpacity 
               style={styles.iconButton} 
               onPress={handleCopyExport}
@@ -112,6 +194,22 @@ export default function FixedBillsScreen() {
             >
               <FontAwesome name="copy" size={20} color="#FFFFFF" />
             </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.iconButton} 
+              onPress={handleAdd}
+              hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+            >
+              <Ionicons name="add" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+            {bills.length > 0 && (
+              <TouchableOpacity 
+                style={styles.iconButton} 
+                onPress={handleSort}
+                hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+              >
+                <Ionicons name="swap-vertical" size={22} color="#FFFFFF" />
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </View>
@@ -158,8 +256,16 @@ export default function FixedBillsScreen() {
           <View style={styles.billsList}>
             {loading ? (
               <Text style={styles.loadingText}>Loading bills...</Text>
-            ) : bills.length > 0 ? (
-              bills.map((bill, index) => renderBillCard(bill, index))
+            ) : displayedBills.length > 0 ? (
+              <React.Fragment>
+                {displayedBills.map((bill, index) => renderBillCard(bill, index))}
+                <View style={styles.totalContainer}>
+                  <Text style={styles.totalLabel}>Total Monthly Bills</Text>
+                  <Text style={styles.totalAmount}>
+                    ${displayedBills.reduce((sum, bill) => sum + bill.bill_cost, 0).toFixed(2)}
+                  </Text>
+                </View>
+              </React.Fragment>
             ) : (
               <View style={styles.emptyState}>
                 <Ionicons name="receipt-outline" size={64} color="#3A3A3A" />
@@ -331,6 +437,7 @@ const styles = StyleSheet.create({
   },
   billAmountContainer: {
     alignItems: 'flex-end',
+    marginRight: 8,
   },
   billAmount: {
     color: '#FFFFFF',
@@ -341,6 +448,32 @@ const styles = StyleSheet.create({
   billLabel: {
     color: '#888888',
     fontSize: 12,
+  },
+  chevron: {
+    marginLeft: 4,
+  },
+
+  // Total Container
+  totalContainer: {
+    backgroundColor: '#1A2F1A',
+    borderRadius: 12,
+    padding: 20,
+    marginTop: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#2A3F2A',
+  },
+  totalLabel: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  totalAmount: {
+    color: colors.green,
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 
   // Empty State
