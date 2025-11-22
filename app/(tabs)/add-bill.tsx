@@ -27,20 +27,24 @@ export default function AddBillScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleSave = async () => {
-    if (!billName.trim()) {
-      Alert.alert('Validation Error', 'Please enter a bill name');
-      return;
-    }
-
-    if (!amount.trim() || isNaN(parseFloat(amount))) {
-      Alert.alert('Validation Error', 'Please enter a valid amount');
-      return;
-    }
-
     try {
+      if (!billName.trim()) {
+        Alert.alert('Validation Error', 'Please enter a bill name');
+        return;
+      }
+
+      if (!amount.trim() || isNaN(parseFloat(amount))) {
+        Alert.alert('Validation Error', 'Please enter a valid amount');
+        return;
+      }
+
       setSaving(true);
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
+      if (sessionError) {
+        throw sessionError;
+      }
+
       if (!session) {
         Alert.alert('Error', 'You must be logged in to add bills');
         return;
@@ -56,9 +60,7 @@ export default function AddBillScreen() {
         });
 
       if (error) {
-        console.log('Error adding bill:', error);
-        Alert.alert('Error', 'Failed to add bill');
-        return;
+        throw error;
       }
 
       Alert.alert('Success', 'Bill added successfully', [
@@ -68,27 +70,36 @@ export default function AddBillScreen() {
         },
       ]);
     } catch (error) {
-      console.log('Error in handleSave:', error);
-      Alert.alert('Error', 'Failed to add bill');
+      console.error('Error in handleSave:', error);
+      Alert.alert('Error', 'Failed to add bill. Please try again.');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setDueDate(selectedDate);
+    try {
+      setShowDatePicker(Platform.OS === 'ios');
+      if (selectedDate) {
+        setDueDate(selectedDate);
+      }
+    } catch (error) {
+      console.error('Error in handleDateChange:', error);
     }
   };
 
   const formatDate = (date: Date | null) => {
-    if (!date) return 'Select date';
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    try {
+      if (!date) return 'Select date';
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Select date';
+    }
   };
 
   return (

@@ -52,10 +52,7 @@ export default function EditBillScreen() {
         .single();
 
       if (error) {
-        console.log('Error fetching bill:', error);
-        Alert.alert('Error', 'Failed to load bill details');
-        router.back();
-        return;
+        throw error;
       }
 
       if (data) {
@@ -67,7 +64,7 @@ export default function EditBillScreen() {
         }
       }
     } catch (error) {
-      console.log('Error in fetchBillDetails:', error);
+      console.error('Error fetching bill details:', error);
       Alert.alert('Error', 'Failed to load bill details');
       router.back();
     } finally {
@@ -76,17 +73,17 @@ export default function EditBillScreen() {
   };
 
   const handleSave = async () => {
-    if (!billName.trim()) {
-      Alert.alert('Validation Error', 'Please enter a bill name');
-      return;
-    }
-
-    if (!amount.trim() || isNaN(parseFloat(amount))) {
-      Alert.alert('Validation Error', 'Please enter a valid amount');
-      return;
-    }
-
     try {
+      if (!billName.trim()) {
+        Alert.alert('Validation Error', 'Please enter a bill name');
+        return;
+      }
+
+      if (!amount.trim() || isNaN(parseFloat(amount))) {
+        Alert.alert('Validation Error', 'Please enter a valid amount');
+        return;
+      }
+
       setSaving(true);
       const { error } = await supabase
         .from('FixedBills')
@@ -98,9 +95,7 @@ export default function EditBillScreen() {
         .eq('id', id);
 
       if (error) {
-        console.log('Error updating bill:', error);
-        Alert.alert('Error', 'Failed to save changes');
-        return;
+        throw error;
       }
 
       Alert.alert('Success', 'Bill updated successfully', [
@@ -110,29 +105,34 @@ export default function EditBillScreen() {
         },
       ]);
     } catch (error) {
-      console.log('Error in handleSave:', error);
-      Alert.alert('Error', 'Failed to save changes');
+      console.error('Error saving bill:', error);
+      Alert.alert('Error', 'Failed to save changes. Please try again.');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = () => {
-    Alert.alert(
-      'Delete Bill',
-      'Are you sure you want to delete this bill? This action cannot be undone.',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: confirmDelete,
-        },
-      ]
-    );
+    try {
+      Alert.alert(
+        'Delete Bill',
+        'Are you sure you want to delete this bill? This action cannot be undone.',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: confirmDelete,
+          },
+        ]
+      );
+    } catch (error) {
+      console.error('Error in handleDelete:', error);
+      Alert.alert('Error', 'Failed to delete bill');
+    }
   };
 
   const confirmDelete = async () => {
@@ -143,9 +143,7 @@ export default function EditBillScreen() {
         .eq('id', id);
 
       if (error) {
-        console.log('Error deleting bill:', error);
-        Alert.alert('Error', 'Failed to delete bill');
-        return;
+        throw error;
       }
 
       Alert.alert('Success', 'Bill deleted successfully', [
@@ -155,25 +153,34 @@ export default function EditBillScreen() {
         },
       ]);
     } catch (error) {
-      console.log('Error in confirmDelete:', error);
-      Alert.alert('Error', 'Failed to delete bill');
+      console.error('Error deleting bill:', error);
+      Alert.alert('Error', 'Failed to delete bill. Please try again.');
     }
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setDueDate(selectedDate);
+    try {
+      setShowDatePicker(Platform.OS === 'ios');
+      if (selectedDate) {
+        setDueDate(selectedDate);
+      }
+    } catch (error) {
+      console.error('Error in handleDateChange:', error);
     }
   };
 
   const formatDate = (date: Date | null) => {
-    if (!date) return 'Select date';
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    try {
+      if (!date) return 'Select date';
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Select date';
+    }
   };
 
   if (loading) {

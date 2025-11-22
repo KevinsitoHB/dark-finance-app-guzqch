@@ -38,8 +38,16 @@ export default function FixedBillsScreen() {
   );
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    setIsLoggedIn(!!session);
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        throw error;
+      }
+      setIsLoggedIn(!!session);
+    } catch (error) {
+      console.error('Error checking auth:', error);
+      setIsLoggedIn(false);
+    }
   };
 
   const fetchBills = async () => {
@@ -51,97 +59,133 @@ export default function FixedBillsScreen() {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.log('Error fetching bills:', error);
-      } else {
-        setBills(data || []);
+        throw error;
       }
+      
+      setBills(data || []);
     } catch (error) {
-      console.log('Error in fetchBills:', error);
+      console.error('Error fetching bills:', error);
+      Alert.alert('Error', 'Failed to load bills. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleSort = () => {
-    const newSortOrder = sortOrder === 'high-to-low' ? 'low-to-high' : 'high-to-low';
-    setSortOrder(newSortOrder);
-    
-    const sortedBills = [...bills].sort((a, b) => {
-      if (newSortOrder === 'high-to-low') {
-        return b.bill_cost - a.bill_cost;
-      } else {
-        return a.bill_cost - b.bill_cost;
-      }
-    });
-    
-    setBills(sortedBills);
+    try {
+      const newSortOrder = sortOrder === 'high-to-low' ? 'low-to-high' : 'high-to-low';
+      setSortOrder(newSortOrder);
+      
+      const sortedBills = [...bills].sort((a, b) => {
+        if (newSortOrder === 'high-to-low') {
+          return b.bill_cost - a.bill_cost;
+        } else {
+          return a.bill_cost - b.bill_cost;
+        }
+      });
+      
+      setBills(sortedBills);
+    } catch (error) {
+      console.error('Error sorting bills:', error);
+      Alert.alert('Error', 'Failed to sort bills');
+    }
   };
 
   const handleAdd = () => {
-    router.push('/(tabs)/add-bill');
+    try {
+      router.push('/(tabs)/add-bill');
+    } catch (error) {
+      console.error('Error navigating to add bill:', error);
+      Alert.alert('Error', 'Failed to open add bill screen');
+    }
   };
 
   const handleCopyExport = () => {
-    if (bills.length === 0) {
-      Alert.alert('No Bills', 'There are no bills to export');
-      return;
-    }
+    try {
+      if (bills.length === 0) {
+        Alert.alert('No Bills', 'There are no bills to export');
+        return;
+      }
 
-    Alert.alert(
-      'Export Bills',
-      'Choose an export option',
-      [
-        {
-          text: 'Copy to Clipboard',
-          onPress: copyToClipboard,
-        },
-        {
-          text: 'Download CSV',
-          onPress: downloadCSV,
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-      ]
-    );
+      Alert.alert(
+        'Export Bills',
+        'Choose an export option',
+        [
+          {
+            text: 'Copy to Clipboard',
+            onPress: copyToClipboard,
+          },
+          {
+            text: 'Download CSV',
+            onPress: downloadCSV,
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ]
+      );
+    } catch (error) {
+      console.error('Error in handleCopyExport:', error);
+      Alert.alert('Error', 'Failed to export bills');
+    }
   };
 
   const copyToClipboard = () => {
-    let text = 'Fixed Bills\n\n';
-    bills.forEach((bill, index) => {
-      text += `${index + 1}. ${bill.bill_name}\n`;
-      text += `   Amount: $${bill.bill_cost.toFixed(2)}\n`;
-      if (bill.due_date) {
-        text += `   Due Date: ${new Date(bill.due_date).toLocaleDateString()}\n`;
-      }
-      text += '\n';
-    });
-    
-    const total = bills.reduce((sum, bill) => sum + bill.bill_cost, 0);
-    text += `Total: $${total.toFixed(2)}`;
+    try {
+      let text = 'Fixed Bills\n\n';
+      bills.forEach((bill, index) => {
+        text += `${index + 1}. ${bill.bill_name}\n`;
+        text += `   Amount: $${bill.bill_cost.toFixed(2)}\n`;
+        if (bill.due_date) {
+          text += `   Due Date: ${new Date(bill.due_date).toLocaleDateString()}\n`;
+        }
+        text += '\n';
+      });
+      
+      const total = bills.reduce((sum, bill) => sum + bill.bill_cost, 0);
+      text += `Total: $${total.toFixed(2)}`;
 
-    Clipboard.setString(text);
-    Alert.alert('Success', 'Bills copied to clipboard');
+      Clipboard.setString(text);
+      Alert.alert('Success', 'Bills copied to clipboard');
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      Alert.alert('Error', 'Failed to copy bills to clipboard');
+    }
   };
 
   const downloadCSV = () => {
-    // CSV download functionality would require expo-file-system
-    Alert.alert('Coming Soon', 'CSV download functionality will be available soon');
+    try {
+      // CSV download functionality would require expo-file-system
+      Alert.alert('Coming Soon', 'CSV download functionality will be available soon');
+    } catch (error) {
+      console.error('Error in downloadCSV:', error);
+      Alert.alert('Error', 'Failed to download CSV');
+    }
   };
 
   const handleBillPress = (billId: number) => {
-    router.push(`/(tabs)/edit-bill/${billId}`);
+    try {
+      router.push(`/(tabs)/edit-bill/${billId}`);
+    } catch (error) {
+      console.error('Error navigating to edit bill:', error);
+      Alert.alert('Error', 'Failed to open bill details');
+    }
   };
 
   const getSortedBills = () => {
-    return [...bills].sort((a, b) => {
-      if (sortOrder === 'high-to-low') {
-        return b.bill_cost - a.bill_cost;
-      } else {
-        return a.bill_cost - b.bill_cost;
-      }
-    });
+    try {
+      return [...bills].sort((a, b) => {
+        if (sortOrder === 'high-to-low') {
+          return b.bill_cost - a.bill_cost;
+        } else {
+          return a.bill_cost - b.bill_cost;
+        }
+      });
+    } catch (error) {
+      console.error('Error sorting bills:', error);
+      return bills;
+    }
   };
 
   const renderBillCard = (bill: FixedBill, index: number) => (
