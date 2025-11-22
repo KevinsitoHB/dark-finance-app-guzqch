@@ -4,7 +4,17 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import BudgetCard from './BudgetCard';
 import { colors } from '@/styles/commonStyles';
 
-export default function BudgetBreakdown() {
+interface BudgetBreakdownProps {
+  monthlyIncome?: number;
+  fixedBillsTotal?: number;
+  remainingAfterBills?: number;
+}
+
+export default function BudgetBreakdown({
+  monthlyIncome = 0,
+  fixedBillsTotal = 0,
+  remainingAfterBills = 0,
+}: BudgetBreakdownProps) {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Budget Breakdown</Text>
@@ -17,7 +27,7 @@ export default function BudgetBreakdown() {
           backgroundColor="rgba(255, 77, 77, 0.08)"
           borderColor={colors.red}
           label="Fixed Bills:"
-          value="$0"
+          value={`$${fixedBillsTotal.toFixed(0)}`}
           valueColor={colors.red}
           dotColor={colors.red}
         />
@@ -25,7 +35,7 @@ export default function BudgetBreakdown() {
           backgroundColor="rgba(255, 194, 71, 0.08)"
           borderColor={colors.yellow}
           label="Remaining:"
-          value="$0"
+          value={`$${remainingAfterBills.toFixed(0)}`}
           valueColor={colors.yellow}
           dotColor={colors.yellow}
         />
@@ -33,7 +43,7 @@ export default function BudgetBreakdown() {
           backgroundColor="rgba(46, 255, 139, 0.08)"
           borderColor={colors.green}
           label="Income:"
-          value="$0"
+          value={`$${monthlyIncome.toFixed(0)}`}
           valueColor={colors.green}
           dotColor={colors.green}
         />

@@ -2,45 +2,42 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import SummaryCard from './SummaryCard';
 import CurrencyInputModal from './CurrencyInputModal';
 import { colors } from '@/styles/commonStyles';
 import { supabase } from '@/app/integrations/supabase/client';
 
-export default function FinancialOverview() {
-  const [monthlyIncome, setMonthlyIncome] = useState(0);
-  const [fixedBillsTotal, setFixedBillsTotal] = useState(0);
+interface FinancialOverviewProps {
+  monthlyIncome: number;
+  fixedBillsTotal: number;
+  onIncomeUpdate: (newIncome: number) => void;
+}
+
+export default function FinancialOverview({
+  monthlyIncome,
+  fixedBillsTotal,
+  onIncomeUpdate,
+}: FinancialOverviewProps) {
+  const router = useRouter();
+  const [totalAccountsDebt, setTotalAccountsDebt] = useState(0);
+  const [accountsCount, setAccountsCount] = useState(0);
+  const [accountsMonthlyMinimums, setAccountsMonthlyMinimums] = useState(0);
   const [showIncomeModal, setShowIncomeModal] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchFinancialData();
+    fetchAccountsData();
   }, []);
 
-  // Refresh data when screen comes into focus
+  // Refresh accounts data when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
-      console.log('Dashboard focused, refreshing financial data...');
-      fetchFinancialData();
+      console.log('Financial Overview focused, refreshing accounts data...');
+      fetchAccountsData();
     }, [])
   );
 
-  const fetchFinancialData = async () => {
-    try {
-      setLoading(true);
-      await Promise.all([
-        fetchMonthlyIncome(),
-        fetchFixedBillsTotal(),
-      ]);
-    } catch (error) {
-      console.error('Error fetching financial data:', error);
-      Alert.alert('Error', 'Failed to load financial data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchMonthlyIncome = async () => {
+  const fetchAccountsData = async () => {
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
@@ -50,61 +47,32 @@ export default function FinancialOverview() {
 
       if (!user) {
         console.log('No user logged in');
-        setMonthlyIncome(0);
+        setTotalAccountsDebt(0);
+        setAccountsCount(0);
+        setAccountsMonthlyMinimums(0);
         return;
       }
 
       const { data, error } = await supabase
-        .from('FixedIncome')
-        .select('monthly_income')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          // No record found, that's okay
-          console.log('No income record found for user');
-          setMonthlyIncome(0);
-        } else {
-          throw error;
-        }
-      } else {
-        setMonthlyIncome(data?.monthly_income || 0);
-      }
-    } catch (error) {
-      console.error('Error fetching monthly income:', error);
-      setMonthlyIncome(0);
-    }
-  };
-
-  const fetchFixedBillsTotal = async () => {
-    try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError) {
-        throw userError;
-      }
-
-      if (!user) {
-        console.log('No user logged in');
-        setFixedBillsTotal(0);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('FixedBills')
-        .select('bill_cost')
+        .from('Accounts')
+        .select('current_balance, minimum_payment')
         .eq('user_id', user.id);
 
       if (error) {
         throw error;
       }
 
-      const total = data?.reduce((sum, bill) => sum + (bill.bill_cost || 0), 0) || 0;
-      setFixedBillsTotal(total);
+      const totalDebt = data?.reduce((sum, account) => sum + (account.current_balance || 0), 0) || 0;
+      const totalMinimums = data?.reduce((sum, account) => sum + (account.minimum_payment || 0), 0) || 0;
+      
+      setTotalAccountsDebt(totalDebt);
+      setAccountsCount(data?.length || 0);
+      setAccountsMonthlyMinimums(totalMinimums);
     } catch (error) {
-      console.error('Error fetching fixed bills total:', error);
-      setFixedBillsTotal(0);
+      console.error('Error fetching accounts data:', error);
+      setTotalAccountsDebt(0);
+      setAccountsCount(0);
+      setAccountsMonthlyMinimums(0);
     }
   };
 
@@ -112,8 +80,17 @@ export default function FinancialOverview() {
     setShowIncomeModal(true);
   };
 
+  const handleFixedBillsCardPress = () => {
+    try {
+      router.push('/(tabs)/fixedbills');
+    } catch (error) {
+      console.error('Error navigating to fixed bills:', error);
+      Alert.alert('Error', 'Failed to navigate to Fixed Bills');
+    }
+  };
+
   const handleIncomeSave = (value: number) => {
-    setMonthlyIncome(value);
+    onIncomeUpdate(value);
   };
 
   const remainingAfterBills = monthlyIncome - fixedBillsTotal;
@@ -141,6 +118,7 @@ export default function FinancialOverview() {
           value={`$${fixedBillsTotal.toFixed(0)}`}
           valueColor={colors.red}
           subtext="Fixed Bills"
+          onPress={handleFixedBillsCardPress}
         />
         <SummaryCard
           backgroundColor="rgba(255, 194, 71, 0.08)"
@@ -156,9 +134,22 @@ export default function FinancialOverview() {
           borderColor={colors.red}
           iconName="credit_card"
           iconColor={colors.red}
-          value="$0"
+          value={`$${totalAccountsDebt.toFixed(0)}`}
           valueColor={colors.red}
-          subtext="Total Accounts Debt, 0 accounts"
+          subtext={`Total Accounts Debt, ${accountsCount} accounts`}
+        />
+      </View>
+
+      {/* Second row - Accounts Monthly Minimums (non-clickable) */}
+      <View style={styles.cardsGrid}>
+        <SummaryCard
+          backgroundColor="rgba(255, 194, 71, 0.08)"
+          borderColor={colors.yellow}
+          iconName="account_balance"
+          iconColor={colors.yellow}
+          value={`$${accountsMonthlyMinimums.toFixed(0)}`}
+          valueColor={colors.yellow}
+          subtext="Accounts Monthly Minimums"
         />
       </View>
 

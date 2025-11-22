@@ -30,12 +30,54 @@ export default function CurrencyInputModal({
 }: CurrencyInputModalProps) {
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fetchingData, setFetchingData] = useState(false);
 
   useEffect(() => {
     if (visible) {
-      setInputValue(initialValue > 0 ? initialValue.toString() : '');
+      fetchCurrentIncome();
     }
-  }, [visible, initialValue]);
+  }, [visible]);
+
+  const fetchCurrentIncome = async () => {
+    try {
+      setFetchingData(true);
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        throw userError;
+      }
+
+      if (!user) {
+        console.log('No user logged in');
+        setInputValue(initialValue > 0 ? initialValue.toString() : '');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('FixedIncome')
+        .select('monthly_income')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No record found, use initial value
+          console.log('No income record found for user');
+          setInputValue(initialValue > 0 ? initialValue.toString() : '');
+        } else {
+          throw error;
+        }
+      } else {
+        const income = data?.monthly_income || 0;
+        setInputValue(income > 0 ? income.toString() : '');
+      }
+    } catch (error) {
+      console.error('Error fetching current income:', error);
+      setInputValue(initialValue > 0 ? initialValue.toString() : '');
+    } finally {
+      setFetchingData(false);
+    }
+  };
 
   const formatCurrency = (value: string) => {
     // Remove non-numeric characters except decimal point
@@ -148,19 +190,26 @@ export default function CurrencyInputModal({
 
           <View style={styles.content}>
             <Text style={styles.label}>Enter your monthly income</Text>
-            <View style={styles.inputContainer}>
-              <Text style={styles.currencySymbol}>$</Text>
-              <TextInput
-                style={styles.input}
-                value={inputValue}
-                onChangeText={handleInputChange}
-                keyboardType="decimal-pad"
-                placeholder="0.00"
-                placeholderTextColor={colors.subtextGray}
-                autoFocus
-                editable={!loading}
-              />
-            </View>
+            {fetchingData ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator color={colors.green} />
+                <Text style={styles.loadingText}>Loading current income...</Text>
+              </View>
+            ) : (
+              <View style={styles.inputContainer}>
+                <Text style={styles.currencySymbol}>$</Text>
+                <TextInput
+                  style={styles.input}
+                  value={inputValue}
+                  onChangeText={handleInputChange}
+                  keyboardType="decimal-pad"
+                  placeholder="0.00"
+                  placeholderTextColor={colors.subtextGray}
+                  autoFocus
+                  editable={!loading}
+                />
+              </View>
+            )}
           </View>
 
           <View style={styles.footer}>
@@ -174,7 +223,7 @@ export default function CurrencyInputModal({
             <TouchableOpacity
               style={[styles.button, styles.saveButton]}
               onPress={handleSave}
-              disabled={loading}
+              disabled={loading || fetchingData}
             >
               {loading ? (
                 <ActivityIndicator color={colors.background} />
@@ -230,6 +279,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.subtextGray,
     marginBottom: 12,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: colors.subtextGray,
+    marginTop: 8,
   },
   inputContainer: {
     flexDirection: 'row',
