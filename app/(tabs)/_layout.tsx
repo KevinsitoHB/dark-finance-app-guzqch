@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Stack } from 'expo-router';
+import { Tabs } from 'expo-router';
 import FloatingTabBar, { TabBarItem } from '@/components/FloatingTabBar';
+import { View } from 'react-native';
 
 export default function TabLayout() {
   // Define the tabs configuration
@@ -38,35 +39,60 @@ export default function TabLayout() {
     },
   ];
 
-  // For Android and Web, use Stack navigation with custom floating tab bar
+  // For Android and Web, use Tabs with custom floating tab bar to prevent remounting
   return (
     <>
-      <Stack
+      <Tabs
         screenOptions={{
           headerShown: false,
-          animation: 'none',
+          lazy: false, // Prevent lazy loading to keep components mounted
+          unmountOnBlur: false, // Keep screens mounted when navigating away
         }}
+        tabBar={() => null} // Hide default tab bar
       >
-        <Stack.Screen key="home" name="(home)" />
-        <Stack.Screen key="fixedbills" name="fixedbills" />
-        <Stack.Screen key="planning" name="planning" />
-        <Stack.Screen key="accounts" name="accounts" />
-        <Stack.Screen key="myaccount" name="myaccount" />
-        <Stack.Screen 
-          key="edit-bill" 
+        <Tabs.Screen 
+          name="(home)" 
+          options={{
+            href: '/(tabs)/(home)/',
+          }}
+        />
+        <Tabs.Screen 
+          name="fixedbills"
+          options={{
+            href: '/(tabs)/fixedbills',
+          }}
+        />
+        <Tabs.Screen 
+          name="planning"
+          options={{
+            href: '/(tabs)/planning',
+          }}
+        />
+        <Tabs.Screen 
+          name="accounts"
+          options={{
+            href: '/(tabs)/accounts',
+          }}
+        />
+        <Tabs.Screen 
+          name="myaccount"
+          options={{
+            href: '/(tabs)/myaccount',
+          }}
+        />
+        <Tabs.Screen 
           name="edit-bill"
           options={{
-            presentation: 'card',
+            href: null,
           }}
         />
-        <Stack.Screen 
-          key="add-bill" 
+        <Tabs.Screen 
           name="add-bill"
           options={{
-            presentation: 'card',
+            href: null,
           }}
         />
-      </Stack>
+      </Tabs>
       <FloatingTabBar tabs={tabs} />
     </>
   );

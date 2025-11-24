@@ -29,10 +29,28 @@ export default function FloatingTabBar({ tabs }: FloatingTabBarProps) {
     return pathname === route || pathname.startsWith(route);
   };
 
+  const getIconForTab = (tabName: string) => {
+    switch (tabName) {
+      case '(home)':
+        return { ios: 'chart.bar.fill', android: 'dashboard' };
+      case 'fixedbills':
+        return { ios: 'receipt.fill', android: 'receipt' };
+      case 'planning':
+        return { ios: 'lightbulb.fill', android: 'lightbulb' };
+      case 'accounts':
+        return { ios: 'wallet.pass.fill', android: 'account_balance_wallet' };
+      case 'myaccount':
+        return { ios: 'person.fill', android: 'person' };
+      default:
+        return { ios: 'circle.fill', android: 'circle' };
+    }
+  };
+
   const TabBarContent = () => (
     <View style={styles.tabBar}>
       {tabs.map((tab, index) => {
         const active = isActive(tab.route);
+        const icons = getIconForTab(tab.name);
         return (
           <TouchableOpacity
             key={index}
@@ -40,8 +58,8 @@ export default function FloatingTabBar({ tabs }: FloatingTabBarProps) {
             onPress={() => router.push(tab.route as any)}
           >
             <IconSymbol
-              ios_icon_name={tab.icon}
-              android_material_icon_name={tab.icon}
+              ios_icon_name={icons.ios}
+              android_material_icon_name={icons.android}
               size={24}
               color={active ? colors.green : colors.subtextGray}
             />

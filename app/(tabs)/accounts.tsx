@@ -1,16 +1,186 @@
 
-import React from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Platform, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '@/styles/commonStyles';
-import CustomHeader from '@/components/CustomHeader';
+import { supabase } from '@/app/integrations/supabase/client';
+
+interface Account {
+  id: number;
+  acct_name: string;
+  current_balance: number;
+  minimum_payment: number;
+  my_monthly_pay: number;
+  apr_interest: number;
+  due_date: string | null;
+  acct_type: string | null;
+  loan_limit: number;
+  created_at: string;
+  user_id: string;
+}
 
 export default function AccountsScreen() {
+  const router = useRouter();
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  // Use useFocusEffect to refresh accounts when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('Accounts screen focused, checking auth and refreshing data...');
+      checkAuth();
+    }, [])
+  );
+
+  const checkAuth = async () => {
+    try {
+      setLoading(true);
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        throw error;
+      }
+      const loggedIn = !!session;
+      console.log('Auth check - logged in:', loggedIn);
+      setIsLoggedIn(loggedIn);
+      
+      // Only fetch accounts if logged in
+      if (loggedIn) {
+        await fetchAccounts();
+      } else {
+        setAccounts([]);
+      }
+    } catch (error) {
+      console.error('Error checking auth:', error);
+      setIsLoggedIn(false);
+      setAccounts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAccounts = async () => {
+    try {
+      console.log('Fetching accounts from Supabase...');
+      const { data, error } = await supabase
+        .from('Accounts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+      
+      console.log('Accounts fetched:', data?.length || 0);
+      setAccounts(data || []);
+    } catch (error) {
+      console.error('Error fetching accounts:', error);
+      Alert.alert('Error', 'Failed to load accounts. Please try again.');
+    }
+  };
+
+  const renderAccountCard = (account: Account, index: number) => (
+    <View
+      key={index}
+      style={styles.accountCard}
+    >
+      <View style={styles.accountIconContainer}>
+        <View style={styles.accountIcon}>
+          <Ionicons name="card-outline" size={24} color="#4A90E2" />
+        </View>
+        <View style={styles.accountBadge}>
+          <Text style={styles.accountBadgeText}>
+            {account.acct_type?.toUpperCase() || 'ACCOUNT'}
+          </Text>
+        </View>
+      </View>
+      <View style={styles.accountContent}>
+        <Text style={styles.accountName}>{account.acct_name || 'Unnamed Account'}</Text>
+        <Text style={styles.accountType}>
+          {account.due_date 
+            ? `Due: ${new Date(account.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+            : 'Account'
+          }
+        </Text>
+      </View>
+      <View style={styles.accountAmountContainer}>
+        <Text style={styles.accountAmount}>${account.current_balance?.toFixed(2) || '0.00'}</Text>
+        <Text style={styles.accountLabel}>Balance</Text>
+      </View>
+    </View>
+  );
+
+  const displayedAccounts = accounts;
+  const totalBalance = accounts.reduce((sum, account) => sum + (account.current_balance || 0), 0);
+  const totalMinimumPayment = accounts.reduce((sum, account) => sum + (account.minimum_payment || 0), 0);
+
   return (
     <View style={styles.container}>
-      <CustomHeader title="Accounts" />
-      <View style={styles.content}>
-        <Text style={styles.text}>Accounts screen coming soon...</Text>
+      {/* Top Navbar */}
+      <View style={styles.navbar}>
+        <Text style={styles.navbarTitle}>Accounts</Text>
       </View>
+
+      {/* Content Area */}
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {!isLoggedIn ? (
+          <View style={styles.notLoggedInContainer}>
+            <Ionicons name="lock-closed-outline" size={64} color="#3A3A3A" />
+            <Text style={styles.notLoggedInTitle}>Please Sign In</Text>
+            <Text style={styles.notLoggedInText}>
+              Sign in to view and manage your accounts
+            </Text>
+            <TouchableOpacity
+              style={styles.signInButton}
+              onPress={() => router.push('/(tabs)/myaccount')}
+            >
+              <Text style={styles.signInButtonText}>Go to My Account</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.accountsList}>
+            {loading ? (
+              <Text style={styles.loadingText}>Loading accounts...</Text>
+            ) : displayedAccounts.length > 0 ? (
+              <React.Fragment>
+                {displayedAccounts.map((account, index) => renderAccountCard(account, index))}
+                <View style={styles.summaryContainer}>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>Total Balance</Text>
+                    <Text style={styles.summaryAmount}>
+                      ${totalBalance.toFixed(2)}
+                    </Text>
+                  </View>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>Total Minimum Payment</Text>
+                    <Text style={styles.summaryAmountSecondary}>
+                      ${totalMinimumPayment.toFixed(2)}
+                    </Text>
+                  </View>
+                </View>
+              </React.Fragment>
+            ) : (
+              <View style={styles.emptyState}>
+                <Ionicons name="card-outline" size={64} color="#3A3A3A" />
+                <Text style={styles.emptyStateText}>No accounts yet</Text>
+                <Text style={styles.emptyStateSubtext}>
+                  Your accounts will appear here once added
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 }
@@ -21,15 +191,202 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     paddingTop: Platform.OS === 'android' ? 48 : 0,
   },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
+  
+  // Navbar Styles
+  navbar: {
+    height: 44,
+    backgroundColor: '#0C1C17',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+  },
+  navbarTitle: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
+  },
+
+  // Content Styles
+  scrollView: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 100,
+  },
+  accountsList: {
+    width: '100%',
+  },
+
+  // Not Logged In State
+  notLoggedInContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
     paddingHorizontal: 20,
   },
-  text: {
+  notLoggedInTitle: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '700',
+    marginTop: 24,
+    marginBottom: 12,
+  },
+  notLoggedInText: {
+    color: '#888888',
     fontSize: 16,
-    color: colors.subtextGray,
     textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 24,
+  },
+  signInButton: {
+    backgroundColor: colors.green,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+  },
+  signInButtonText: {
+    color: colors.background,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+
+  // Account Card Styles
+  accountCard: {
+    backgroundColor: '#0A1714',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#1A2F2F',
+    padding: 16,
+    minHeight: 80,
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  accountIconContainer: {
+    position: 'relative',
+    marginRight: 16,
+  },
+  accountIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: 'rgba(74, 144, 226, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(74, 144, 226, 0.3)',
+  },
+  accountBadge: {
+    position: 'absolute',
+    bottom: -4,
+    left: '50%',
+    transform: [{ translateX: -24 }],
+    backgroundColor: '#2A2A2A',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#3A3A3A',
+  },
+  accountBadgeText: {
+    color: '#888888',
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  accountContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  accountName: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  accountType: {
+    color: '#888888',
+    fontSize: 13,
+  },
+  accountAmountContainer: {
+    alignItems: 'flex-end',
+    marginRight: 8,
+  },
+  accountAmount: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 2,
+  },
+  accountLabel: {
+    color: '#888888',
+    fontSize: 12,
+  },
+
+  // Summary Container
+  summaryContainer: {
+    backgroundColor: '#1A2F2F',
+    borderRadius: 12,
+    padding: 20,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#2A3F3F',
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  summaryLabel: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  summaryAmount: {
+    color: colors.green,
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  summaryAmountSecondary: {
+    color: colors.yellow,
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+
+  // Empty State
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  emptyStateText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyStateSubtext: {
+    color: '#888888',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+
+  // Loading
+  loadingText: {
+    color: '#888888',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 40,
   },
 });

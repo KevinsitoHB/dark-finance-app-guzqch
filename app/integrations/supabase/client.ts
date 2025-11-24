@@ -1,3 +1,4 @@
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Database } from './types';
 import { createClient } from '@supabase/supabase-js'
@@ -15,4 +16,9 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     persistSession: true,
     detectSessionInUrl: false,
   },
-})
+});
+
+// Log when session changes for debugging
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log('Auth state changed:', event, session ? 'Session exists' : 'No session');
+});

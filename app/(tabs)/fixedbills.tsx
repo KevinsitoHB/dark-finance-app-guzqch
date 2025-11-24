@@ -26,33 +26,45 @@ export default function FixedBillsScreen() {
 
   useEffect(() => {
     checkAuth();
-    fetchBills();
   }, []);
 
   // Use useFocusEffect to refresh bills when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
-      console.log('Fixed Bills screen focused, refreshing data...');
-      fetchBills();
+      console.log('Fixed Bills screen focused, checking auth and refreshing data...');
+      checkAuth();
     }, [])
   );
 
   const checkAuth = async () => {
     try {
+      setLoading(true);
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
         throw error;
       }
-      setIsLoggedIn(!!session);
+      const loggedIn = !!session;
+      console.log('Auth check - logged in:', loggedIn);
+      setIsLoggedIn(loggedIn);
+      
+      // Only fetch bills if logged in
+      if (loggedIn) {
+        await fetchBills();
+      } else {
+        setBills([]);
+      }
     } catch (error) {
       console.error('Error checking auth:', error);
       setIsLoggedIn(false);
+      setBills([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchBills = async () => {
     try {
-      setLoading(true);
+      console.log('Fetching bills from Supabase...');
       const { data, error } = await supabase
         .from('FixedBills')
         .select('*')
@@ -62,12 +74,11 @@ export default function FixedBillsScreen() {
         throw error;
       }
       
+      console.log('Bills fetched:', data?.length || 0);
       setBills(data || []);
     } catch (error) {
       console.error('Error fetching bills:', error);
       Alert.alert('Error', 'Failed to load bills. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -257,36 +268,38 @@ export default function FixedBillsScreen() {
       </View>
 
       {/* Pill Buttons */}
-      <View style={styles.pillContainer}>
-        <TouchableOpacity
-          style={[
-            styles.pillButton,
-            activeTab === 'bills' && styles.pillButtonActive
-          ]}
-          onPress={() => setActiveTab('bills')}
-        >
-          <Text style={[
-            styles.pillButtonText,
-            activeTab === 'bills' && styles.pillButtonTextActive
-          ]}>
-            Fixed Bills
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.pillButton,
-            activeTab === 'calculators' && styles.pillButtonActive
-          ]}
-          onPress={() => setActiveTab('calculators')}
-        >
-          <Text style={[
-            styles.pillButtonText,
-            activeTab === 'calculators' && styles.pillButtonTextActive
-          ]}>
-            Calculators
-          </Text>
-        </TouchableOpacity>
-      </View>
+      {isLoggedIn && (
+        <View style={styles.pillContainer}>
+          <TouchableOpacity
+            style={[
+              styles.pillButton,
+              activeTab === 'bills' && styles.pillButtonActive
+            ]}
+            onPress={() => setActiveTab('bills')}
+          >
+            <Text style={[
+              styles.pillButtonText,
+              activeTab === 'bills' && styles.pillButtonTextActive
+            ]}>
+              Fixed Bills
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.pillButton,
+              activeTab === 'calculators' && styles.pillButtonActive
+            ]}
+            onPress={() => setActiveTab('calculators')}
+          >
+            <Text style={[
+              styles.pillButtonText,
+              activeTab === 'calculators' && styles.pillButtonTextActive
+            ]}>
+              Calculators
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Content Area */}
       <ScrollView 
@@ -294,7 +307,21 @@ export default function FixedBillsScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {activeTab === 'bills' ? (
+        {!isLoggedIn ? (
+          <View style={styles.notLoggedInContainer}>
+            <Ionicons name="lock-closed-outline" size={64} color="#3A3A3A" />
+            <Text style={styles.notLoggedInTitle}>Please Sign In</Text>
+            <Text style={styles.notLoggedInText}>
+              Sign in to view and manage your fixed bills
+            </Text>
+            <TouchableOpacity
+              style={styles.signInButton}
+              onPress={() => router.push('/(tabs)/myaccount')}
+            >
+              <Text style={styles.signInButtonText}>Go to My Account</Text>
+            </TouchableOpacity>
+          </View>
+        ) : activeTab === 'bills' ? (
           <View style={styles.billsList}>
             {loading ? (
               <Text style={styles.loadingText}>Loading bills...</Text>
@@ -413,6 +440,39 @@ const styles = StyleSheet.create({
   },
   billsList: {
     width: '100%',
+  },
+
+  // Not Logged In State
+  notLoggedInContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+    paddingHorizontal: 20,
+  },
+  notLoggedInTitle: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '700',
+    marginTop: 24,
+    marginBottom: 12,
+  },
+  notLoggedInText: {
+    color: '#888888',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 24,
+  },
+  signInButton: {
+    backgroundColor: colors.green,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+  },
+  signInButtonText: {
+    color: colors.background,
+    fontSize: 16,
+    fontWeight: '700',
   },
 
   // Bill Card Styles
