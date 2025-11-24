@@ -70,7 +70,7 @@ export default function TabLayout() {
         options={{
           title: 'Accounts',
           tabBarIcon: ({ color }) => ({
-            sfSymbol: 'creditcard.fill',
+            sfSymbol: 'wallet.pass.fill',
             hierarchicalColor: color,
           }),
         }}

@@ -22,7 +22,6 @@ export default function FinancialOverview({
   const router = useRouter();
   const [totalAccountsDebt, setTotalAccountsDebt] = useState(0);
   const [accountsCount, setAccountsCount] = useState(0);
-  const [accountsMonthlyMinimums, setAccountsMonthlyMinimums] = useState(0);
   const [showIncomeModal, setShowIncomeModal] = useState(false);
 
   useEffect(() => {
@@ -49,7 +48,6 @@ export default function FinancialOverview({
         console.log('No user logged in');
         setTotalAccountsDebt(0);
         setAccountsCount(0);
-        setAccountsMonthlyMinimums(0);
         return;
       }
 
@@ -63,16 +61,13 @@ export default function FinancialOverview({
       }
 
       const totalDebt = data?.reduce((sum, account) => sum + (account.current_balance || 0), 0) || 0;
-      const totalMinimums = data?.reduce((sum, account) => sum + (account.minimum_payment || 0), 0) || 0;
       
       setTotalAccountsDebt(totalDebt);
       setAccountsCount(data?.length || 0);
-      setAccountsMonthlyMinimums(totalMinimums);
     } catch (error) {
       console.error('Error fetching accounts data:', error);
       setTotalAccountsDebt(0);
       setAccountsCount(0);
-      setAccountsMonthlyMinimums(0);
     }
   };
 
@@ -132,24 +127,11 @@ export default function FinancialOverview({
         <SummaryCard
           backgroundColor="rgba(255, 77, 77, 0.08)"
           borderColor={colors.red}
-          iconName="credit_card"
+          iconName="account_balance"
           iconColor={colors.red}
           value={`$${totalAccountsDebt.toFixed(0)}`}
           valueColor={colors.red}
           subtext={`Total Accounts Debt, ${accountsCount} accounts`}
-        />
-      </View>
-
-      {/* Second row - Accounts Monthly Minimums (non-clickable) */}
-      <View style={styles.cardsGrid}>
-        <SummaryCard
-          backgroundColor="rgba(255, 194, 71, 0.08)"
-          borderColor={colors.yellow}
-          iconName="account_balance"
-          iconColor={colors.yellow}
-          value={`$${accountsMonthlyMinimums.toFixed(0)}`}
-          valueColor={colors.yellow}
-          subtext="Accounts Monthly Minimums"
         />
       </View>
 
