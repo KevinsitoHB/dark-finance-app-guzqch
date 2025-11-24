@@ -12,6 +12,7 @@ import { supabase } from '@/app/integrations/supabase/client';
 export default function HomeScreen() {
   const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [fixedBillsTotal, setFixedBillsTotal] = useState(0);
+  const [totalAccountsDebt, setTotalAccountsDebt] = useState(0);
   const [debugInfo, setDebugInfo] = useState('');
 
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function HomeScreen() {
       await Promise.all([
         fetchMonthlyIncome(),
         fetchFixedBillsTotal(),
+        fetchAccountsDebt(),
       ]);
       console.log('Finished fetchFinancialData');
     } catch (error) {
@@ -147,6 +149,49 @@ export default function HomeScreen() {
     }
   };
 
+  const fetchAccountsDebt = async () => {
+    try {
+      console.log('--- Fetching accounts debt ---');
+      
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        console.error('User error in fetchAccountsDebt:', userError);
+        throw userError;
+      }
+
+      if (!user) {
+        console.log('No user logged in for accounts fetch');
+        setTotalAccountsDebt(0);
+        return;
+      }
+
+      console.log('Querying Accounts table for user:', user.id);
+      const { data, error } = await supabase
+        .from('Accounts')
+        .select('current_balance')
+        .eq('user_id', user.id);
+
+      console.log('Accounts query result:', {
+        hasData: !!data,
+        accountCount: data?.length,
+        error: error?.message
+      });
+
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
+
+      const totalDebt = data?.reduce((sum, account) => sum + (account.current_balance || 0), 0) || 0;
+      console.log('✅ Successfully calculated accounts debt:', totalDebt);
+      setTotalAccountsDebt(totalDebt);
+    } catch (error) {
+      console.error('❌ Error fetching accounts debt:', error);
+      setTotalAccountsDebt(0);
+    }
+  };
+
   const handleIncomeUpdate = (newIncome: number) => {
     console.log('Income updated to:', newIncome);
     setMonthlyIncome(newIncome);
@@ -179,6 +224,7 @@ export default function HomeScreen() {
           monthlyIncome={monthlyIncome}
           fixedBillsTotal={fixedBillsTotal}
           remainingAfterBills={remainingAfterBills}
+          totalAccountsDebt={totalAccountsDebt}
         />
         <MonthlyCalendar />
         <View style={styles.bottomSpacer} />
