@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, View, Alert } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert, Text } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import CustomHeader from '@/components/CustomHeader';
 import FinancialOverview from '@/components/FinancialOverview';
@@ -12,98 +12,143 @@ import { supabase } from '@/app/integrations/supabase/client';
 export default function HomeScreen() {
   const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [fixedBillsTotal, setFixedBillsTotal] = useState(0);
+  const [debugInfo, setDebugInfo] = useState('');
 
   useEffect(() => {
+    console.log('=== HomeScreen mounted ===');
     fetchFinancialData();
   }, []);
 
   // Refresh data when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
-      console.log('Home screen focused, refreshing financial data...');
+      console.log('=== Home screen focused, refreshing financial data ===');
       fetchFinancialData();
     }, [])
   );
 
   const fetchFinancialData = async () => {
     try {
+      console.log('Starting fetchFinancialData...');
       await Promise.all([
         fetchMonthlyIncome(),
         fetchFixedBillsTotal(),
       ]);
+      console.log('Finished fetchFinancialData');
     } catch (error) {
-      console.error('Error fetching financial data:', error);
+      console.error('Error in fetchFinancialData:', error);
     }
   };
 
   const fetchMonthlyIncome = async () => {
     try {
+      console.log('--- Fetching monthly income ---');
+      
+      // Check authentication
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
+      console.log('Auth check result:', {
+        hasUser: !!user,
+        userId: user?.id,
+        userEmail: user?.email,
+        error: userError?.message
+      });
+
       if (userError) {
+        console.error('User error:', userError);
+        setDebugInfo(`Auth Error: ${userError.message}`);
         throw userError;
       }
 
       if (!user) {
-        console.log('No user logged in');
+        console.log('❌ No user logged in - this is the problem!');
+        setDebugInfo('No user logged in. Please implement authentication.');
         setMonthlyIncome(0);
         return;
       }
 
+      console.log('✅ User authenticated:', user.id);
+      setDebugInfo(`User: ${user.email || user.id}`);
+
+      // Fetch income data
+      console.log('Querying FixedIncome table for user:', user.id);
       const { data, error } = await supabase
         .from('FixedIncome')
         .select('monthly_income')
         .eq('user_id', user.id)
         .single();
 
+      console.log('FixedIncome query result:', {
+        hasData: !!data,
+        monthlyIncome: data?.monthly_income,
+        error: error?.message,
+        errorCode: error?.code
+      });
+
       if (error) {
         if (error.code === 'PGRST116') {
-          console.log('No income record found for user');
+          console.log('No income record found for user (PGRST116)');
           setMonthlyIncome(0);
         } else {
+          console.error('Database error:', error);
           throw error;
         }
       } else {
-        setMonthlyIncome(data?.monthly_income || 0);
+        const income = data?.monthly_income || 0;
+        console.log('✅ Successfully fetched income:', income);
+        setMonthlyIncome(income);
       }
     } catch (error) {
-      console.error('Error fetching monthly income:', error);
+      console.error('❌ Error fetching monthly income:', error);
       setMonthlyIncome(0);
     }
   };
 
   const fetchFixedBillsTotal = async () => {
     try {
+      console.log('--- Fetching fixed bills total ---');
+      
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
       if (userError) {
+        console.error('User error in fetchFixedBillsTotal:', userError);
         throw userError;
       }
 
       if (!user) {
-        console.log('No user logged in');
+        console.log('No user logged in for bills fetch');
         setFixedBillsTotal(0);
         return;
       }
 
+      console.log('Querying FixedBills table for user:', user.id);
       const { data, error } = await supabase
         .from('FixedBills')
         .select('bill_cost')
         .eq('user_id', user.id);
 
+      console.log('FixedBills query result:', {
+        hasData: !!data,
+        billCount: data?.length,
+        error: error?.message
+      });
+
       if (error) {
+        console.error('Database error:', error);
         throw error;
       }
 
       const total = data?.reduce((sum, bill) => sum + (bill.bill_cost || 0), 0) || 0;
+      console.log('✅ Successfully calculated bills total:', total);
       setFixedBillsTotal(total);
     } catch (error) {
-      console.error('Error fetching fixed bills total:', error);
+      console.error('❌ Error fetching fixed bills total:', error);
       setFixedBillsTotal(0);
     }
   };
 
   const handleIncomeUpdate = (newIncome: number) => {
+    console.log('Income updated to:', newIncome);
     setMonthlyIncome(newIncome);
   };
 
@@ -117,6 +162,14 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <CustomHeader title="Dashboard" />
+        
+        {/* Debug Info Banner */}
+        {debugInfo && (
+          <View style={styles.debugBanner}>
+            <Text style={styles.debugText}>🔍 Debug: {debugInfo}</Text>
+          </View>
+        )}
+        
         <FinancialOverview 
           monthlyIncome={monthlyIncome}
           fixedBillsTotal={fixedBillsTotal}
@@ -147,5 +200,19 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 40,
+  },
+  debugBanner: {
+    backgroundColor: 'rgba(255, 194, 71, 0.2)',
+    borderWidth: 1,
+    borderColor: colors.yellow,
+    borderRadius: 8,
+    padding: 12,
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  debugText: {
+    color: colors.yellow,
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
