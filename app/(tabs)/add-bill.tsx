@@ -50,19 +50,23 @@ export default function AddBillScreen() {
         return;
       }
 
-      const { error } = await supabase
+      console.log('Inserting bill into FixedBills table...');
+      const { data, error } = await supabase
         .from('FixedBills')
         .insert({
           bill_name: billName.trim(),
           bill_cost: parseFloat(amount),
           due_date: dueDate ? dueDate.toISOString().split('T')[0] : null,
           user_id: session.user.id,
-        });
+        })
+        .select();
 
       if (error) {
+        console.error('Error inserting bill:', error);
         throw error;
       }
 
+      console.log('Bill inserted successfully:', data);
       Alert.alert('Success', 'Bill added successfully', [
         {
           text: 'OK',

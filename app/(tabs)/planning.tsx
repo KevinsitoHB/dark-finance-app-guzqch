@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Platform, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { colors } from '@/styles/commonStyles';
 import { supabase } from '@/app/integrations/supabase/client';
+import { formatCurrency } from '@/utils/formatters';
 
 interface Account {
   id: number;
@@ -21,27 +23,59 @@ interface Account {
 }
 
 export default function PlanningScreen() {
+  const router = useRouter();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [totalDebt, setTotalDebt] = useState(0);
   const [totalAccounts, setTotalAccounts] = useState(0);
   const [payoffYear, setPayoffYear] = useState(0);
   const [monthlyPayments, setMonthlyPayments] = useState(0);
 
   useEffect(() => {
-    fetchAccounts();
+    checkAuth();
   }, []);
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log('Planning screen focused, refreshing data...');
-      fetchAccounts();
+      console.log('Planning screen focused, checking auth and refreshing data...');
+      checkAuth();
     }, [])
   );
 
-  const fetchAccounts = async () => {
+  const checkAuth = async () => {
     try {
       setLoading(true);
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        throw error;
+      }
+      const loggedIn = !!session;
+      console.log('Auth check - logged in:', loggedIn);
+      setIsLoggedIn(loggedIn);
+      
+      // Only fetch accounts if logged in
+      if (loggedIn) {
+        await fetchAccounts();
+      } else {
+        setAccounts([]);
+        setTotalDebt(0);
+        setTotalAccounts(0);
+        setPayoffYear(0);
+        setMonthlyPayments(0);
+      }
+    } catch (error) {
+      console.error('Error checking auth:', error);
+      setIsLoggedIn(false);
+      setAccounts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAccounts = async () => {
+    try {
+      console.log('Fetching accounts from Supabase...');
       const { data, error } = await supabase
         .from('Accounts')
         .select('*')
@@ -55,8 +89,6 @@ export default function PlanningScreen() {
       }
     } catch (error) {
       console.log('Error in fetchAccounts:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -106,7 +138,7 @@ export default function PlanningScreen() {
             <Text style={styles.accountName}>{account.acct_name || 'Unnamed Account'}</Text>
             <Text style={styles.accountType}>{accountType}</Text>
           </View>
-          <Text style={styles.accountBalance}>${(account.current_balance || 0).toFixed(2)}</Text>
+          <Text style={styles.accountBalance}>${formatCurrency(account.current_balance, 2)}</Text>
         </View>
 
         <View style={styles.timeToPayOffContainer}>
@@ -126,12 +158,12 @@ export default function PlanningScreen() {
         <View style={styles.accountDetails}>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Minimum Payment:</Text>
-            <Text style={styles.detailValue}>${(account.minimum_payment || 0).toFixed(0)}</Text>
+            <Text style={styles.detailValue}>${formatCurrency(account.minimum_payment)}</Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>My Monthly Payment:</Text>
             <Text style={[styles.detailValue, styles.detailValueHighlight]}>
-              ${(account.my_monthly_pay || 0).toFixed(0)}
+              ${formatCurrency(account.my_monthly_pay)}
             </Text>
           </View>
           <View style={styles.detailRow}>
@@ -149,8 +181,8 @@ export default function PlanningScreen() {
             <View style={styles.strategyContent}>
               <Ionicons name="trending-up" size={14} color="#FFFFFF" />
               <Text style={styles.strategyText}>
-                Increase to ${(account.minimum_payment * 1.5).toFixed(0)}/month to save $
-                {((account.current_balance * 0.15)).toFixed(0)} in interest
+                Increase to ${formatCurrency(account.minimum_payment * 1.5)}/month to save $
+                {formatCurrency(account.current_balance * 0.15)} in interest
               </Text>
             </View>
           </View>
@@ -174,49 +206,67 @@ export default function PlanningScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Summary Stats */}
-        <View style={styles.summaryContainer}>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>${totalDebt.toFixed(0)}</Text>
-            <Text style={styles.summaryLabel}>Total Debt</Text>
+        {!isLoggedIn ? (
+          <View style={styles.notLoggedInContainer}>
+            <Ionicons name="lock-closed-outline" size={64} color="#3A3A3A" />
+            <Text style={styles.notLoggedInTitle}>Please Sign In</Text>
+            <Text style={styles.notLoggedInText}>
+              Sign in to view and manage your debt planning
+            </Text>
+            <TouchableOpacity
+              style={styles.signInButton}
+              onPress={() => router.push('/(tabs)/myaccount')}
+            >
+              <Text style={styles.signInButtonText}>Go to My Account</Text>
+            </TouchableOpacity>
           </View>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>{totalAccounts}</Text>
-            <Text style={styles.summaryLabel}>Accounts</Text>
-          </View>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>{payoffYear || '—'}</Text>
-            <Text style={styles.summaryLabel}>Payoff Year</Text>
-          </View>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryValue}>${monthlyPayments.toFixed(0)}</Text>
-            <Text style={styles.summaryLabel}>Monthly Payments</Text>
-          </View>
-        </View>
+        ) : (
+          <React.Fragment>
+            {/* Summary Stats */}
+            <View style={styles.summaryContainer}>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>${formatCurrency(totalDebt)}</Text>
+                <Text style={styles.summaryLabel}>Total Debt</Text>
+              </View>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>{totalAccounts}</Text>
+                <Text style={styles.summaryLabel}>Accounts</Text>
+              </View>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>{payoffYear || '—'}</Text>
+                <Text style={styles.summaryLabel}>Payoff Year</Text>
+              </View>
+              <View style={styles.summaryItem}>
+                <Text style={styles.summaryValue}>${formatCurrency(monthlyPayments)}</Text>
+                <Text style={styles.summaryLabel}>Monthly Payments</Text>
+              </View>
+            </View>
 
-        {/* Accounts Section */}
-        <View style={styles.accountsSection}>
-          <Text style={styles.sectionTitle}>Your Debt Accounts</Text>
-          
-          {loading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={colors.green} />
-              <Text style={styles.loadingText}>Loading accounts...</Text>
+            {/* Accounts Section */}
+            <View style={styles.accountsSection}>
+              <Text style={styles.sectionTitle}>Your Debt Accounts</Text>
+              
+              {loading ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" color={colors.green} />
+                  <Text style={styles.loadingText}>Loading accounts...</Text>
+                </View>
+              ) : accounts.length > 0 ? (
+                <React.Fragment>
+                  {accounts.map((account, index) => renderAccountCard(account, index))}
+                </React.Fragment>
+              ) : (
+                <View style={styles.emptyState}>
+                  <Ionicons name="card-outline" size={64} color="#3A3A3A" />
+                  <Text style={styles.emptyStateText}>No accounts yet</Text>
+                  <Text style={styles.emptyStateSubtext}>
+                    Add your first account to start tracking your debt
+                  </Text>
+                </View>
+              )}
             </View>
-          ) : accounts.length > 0 ? (
-            <React.Fragment>
-              {accounts.map((account, index) => renderAccountCard(account, index))}
-            </React.Fragment>
-          ) : (
-            <View style={styles.emptyState}>
-              <Ionicons name="card-outline" size={64} color="#3A3A3A" />
-              <Text style={styles.emptyStateText}>No accounts yet</Text>
-              <Text style={styles.emptyStateSubtext}>
-                Add your first account to start tracking your debt
-              </Text>
-            </View>
-          )}
-        </View>
+          </React.Fragment>
+        )}
       </ScrollView>
     </View>
   );
@@ -248,6 +298,39 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  // Not Logged In State
+  notLoggedInContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+    paddingHorizontal: 20,
+  },
+  notLoggedInTitle: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '700',
+    marginTop: 24,
+    marginBottom: 12,
+  },
+  notLoggedInText: {
+    color: '#888888',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 24,
+  },
+  signInButton: {
+    backgroundColor: colors.green,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+  },
+  signInButtonText: {
+    color: colors.background,
+    fontSize: 16,
+    fontWeight: '700',
   },
 
   // Summary Stats

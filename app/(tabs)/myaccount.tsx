@@ -275,13 +275,6 @@ export default function MyAccountScreen() {
                 : 'Don&apos;t have an account? Sign Up'}
             </Text>
           </TouchableOpacity>
-
-          <View style={styles.testAccountBox}>
-            <Text style={styles.testAccountTitle}>🔑 Test Account</Text>
-            <Text style={styles.testAccountText}>
-              If you have existing data in the database, use the account associated with user ID: d9ed7ab9-241f-4250-994c-17a67c2a8ef6
-            </Text>
-          </View>
         </View>
       </ScrollView>
     </View>
@@ -393,25 +386,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.subtextGray,
     lineHeight: 20,
-  },
-  testAccountBox: {
-    backgroundColor: 'rgba(46, 255, 139, 0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(46, 255, 139, 0.1)',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 16,
-  },
-  testAccountTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.green,
-    marginBottom: 8,
-  },
-  testAccountText: {
-    fontSize: 12,
-    color: colors.subtextGray,
-    lineHeight: 18,
   },
   inputContainer: {
     marginBottom: 16,

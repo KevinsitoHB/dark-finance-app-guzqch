@@ -7,6 +7,7 @@ import SummaryCard from './SummaryCard';
 import CurrencyInputModal from './CurrencyInputModal';
 import { colors } from '@/styles/commonStyles';
 import { supabase } from '@/app/integrations/supabase/client';
+import { formatCurrency } from '@/utils/formatters';
 
 interface FinancialOverviewProps {
   monthlyIncome: number;
@@ -133,9 +134,9 @@ export default function FinancialOverview({
           borderColor={colors.green}
           iconName="wallet"
           iconColor={colors.green}
-          value={`$${monthlyIncome.toFixed(0)}`}
+          value={`$${formatCurrency(monthlyIncome)}`}
           valueColor={colors.green}
-          subtext={`Monthly Income, $${yearlyIncome.toFixed(0)}/year`}
+          subtext={`Monthly Income, $${formatCurrency(yearlyIncome)}/year`}
           onPress={handleIncomeCardPress}
         />
         <SummaryCard
@@ -143,7 +144,7 @@ export default function FinancialOverview({
           borderColor={colors.red}
           iconName="receipt"
           iconColor={colors.red}
-          value={`$${fixedBillsTotal.toFixed(0)}`}
+          value={`$${formatCurrency(fixedBillsTotal)}`}
           valueColor={colors.red}
           subtext="Fixed Bills"
           onPress={handleFixedBillsCardPress}
@@ -153,7 +154,7 @@ export default function FinancialOverview({
           borderColor={colors.yellow}
           iconName="payments"
           iconColor={colors.yellow}
-          value={`$${remainingAfterBills.toFixed(0)}`}
+          value={`$${formatCurrency(remainingAfterBills)}`}
           valueColor={colors.yellow}
           subtext="Remaining After fixed bills"
         />
@@ -162,7 +163,7 @@ export default function FinancialOverview({
           borderColor={colors.red}
           iconName="account_balance"
           iconColor={colors.red}
-          value={`$${totalAccountsDebt.toFixed(0)}`}
+          value={`$${formatCurrency(totalAccountsDebt)}`}
           valueColor={colors.red}
           subtext={`Total Accounts Debt, ${accountsCount} accounts`}
         />

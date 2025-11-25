@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '@/styles/commonStyles';
 import { supabase } from '@/app/integrations/supabase/client';
+import { formatCurrency } from '@/utils/formatters';
 
 interface FixedBill {
   id: number;
@@ -147,7 +148,7 @@ export default function FixedBillsScreen() {
       let text = 'Fixed Bills\n\n';
       bills.forEach((bill, index) => {
         text += `${index + 1}. ${bill.bill_name}\n`;
-        text += `   Amount: $${bill.bill_cost.toFixed(2)}\n`;
+        text += `   Amount: $${formatCurrency(bill.bill_cost, 2)}\n`;
         if (bill.due_date) {
           text += `   Due Date: ${new Date(bill.due_date).toLocaleDateString()}\n`;
         }
@@ -155,7 +156,7 @@ export default function FixedBillsScreen() {
       });
       
       const total = bills.reduce((sum, bill) => sum + bill.bill_cost, 0);
-      text += `Total: $${total.toFixed(2)}`;
+      text += `Total: $${formatCurrency(total, 2)}`;
 
       Clipboard.setString(text);
       Alert.alert('Success', 'Bills copied to clipboard');
@@ -224,7 +225,7 @@ export default function FixedBillsScreen() {
         </Text>
       </View>
       <View style={styles.billAmountContainer}>
-        <Text style={styles.billAmount}>${bill.bill_cost?.toFixed(2) || '0.00'}</Text>
+        <Text style={styles.billAmount}>${formatCurrency(bill.bill_cost, 2)}</Text>
         <Text style={styles.billLabel}>Amount</Text>
       </View>
       <Ionicons name="chevron-forward" size={20} color="#666666" style={styles.chevron} />
@@ -331,7 +332,7 @@ export default function FixedBillsScreen() {
                 <View style={styles.totalContainer}>
                   <Text style={styles.totalLabel}>Total Monthly Bills</Text>
                   <Text style={styles.totalAmount}>
-                    ${displayedBills.reduce((sum, bill) => sum + bill.bill_cost, 0).toFixed(2)}
+                    ${formatCurrency(displayedBills.reduce((sum, bill) => sum + bill.bill_cost, 0), 2)}
                   </Text>
                 </View>
               </React.Fragment>
@@ -364,7 +365,7 @@ const styles = StyleSheet.create({
   
   // Navbar Styles
   navbar: {
-    height: 44,
+    height: 56,
     backgroundColor: '#0C1C17',
     flexDirection: 'row',
     alignItems: 'center',
@@ -373,7 +374,7 @@ const styles = StyleSheet.create({
   },
   navbarTitle: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: 'bold',
     fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
   },

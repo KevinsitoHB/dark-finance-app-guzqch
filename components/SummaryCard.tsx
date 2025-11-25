@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    minHeight: 140,
+    aspectRatio: 1,
     borderRadius: 16,
     borderWidth: 1.5,
     padding: 14,

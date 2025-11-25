@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import BudgetCard from './BudgetCard';
 import { colors } from '@/styles/commonStyles';
+import { formatCurrency } from '@/utils/formatters';
 
 interface BudgetBreakdownProps {
   monthlyIncome?: number;
@@ -34,7 +35,7 @@ export default function BudgetBreakdown({
           backgroundColor="rgba(255, 77, 77, 0.08)"
           borderColor={colors.red}
           label="Fixed Bills:"
-          value={`$${fixedBillsTotal.toFixed(0)}`}
+          value={`$${formatCurrency(fixedBillsTotal)}`}
           valueColor={colors.red}
           dotColor={colors.red}
         />
@@ -42,7 +43,7 @@ export default function BudgetBreakdown({
           backgroundColor="rgba(255, 194, 71, 0.08)"
           borderColor={colors.yellow}
           label="Remaining:"
-          value={`$${remainingAfterBills.toFixed(0)}`}
+          value={`$${formatCurrency(remainingAfterBills)}`}
           valueColor={colors.yellow}
           dotColor={colors.yellow}
         />
@@ -50,7 +51,7 @@ export default function BudgetBreakdown({
           backgroundColor="rgba(46, 255, 139, 0.08)"
           borderColor={colors.green}
           label="Income:"
-          value={`$${monthlyIncome.toFixed(0)}`}
+          value={`$${formatCurrency(monthlyIncome)}`}
           valueColor={colors.green}
           dotColor={colors.green}
         />

@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Platform, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '@/styles/commonStyles';
 import { supabase } from '@/app/integrations/supabase/client';
+import { formatCurrency } from '@/utils/formatters';
 
 interface Account {
   id: number;
@@ -26,6 +27,7 @@ export default function AccountsScreen() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [sortOrder, setSortOrder] = useState<'high-to-low' | 'low-to-high'>('high-to-low');
 
   useEffect(() => {
     checkAuth();
@@ -85,6 +87,34 @@ export default function AccountsScreen() {
     }
   };
 
+  const handleSort = () => {
+    try {
+      const newSortOrder = sortOrder === 'high-to-low' ? 'low-to-high' : 'high-to-low';
+      setSortOrder(newSortOrder);
+      
+      const sortedAccounts = [...accounts].sort((a, b) => {
+        if (newSortOrder === 'high-to-low') {
+          return b.current_balance - a.current_balance;
+        } else {
+          return a.current_balance - b.current_balance;
+        }
+      });
+      
+      setAccounts(sortedAccounts);
+    } catch (error) {
+      console.error('Error sorting accounts:', error);
+      Alert.alert('Error', 'Failed to sort accounts');
+    }
+  };
+
+  const handleAdd = () => {
+    try {
+      Alert.alert('Coming Soon', 'Add account functionality will be available soon');
+    } catch (error) {
+      console.error('Error in handleAdd:', error);
+    }
+  };
+
   const renderAccountCard = (account: Account, index: number) => (
     <View
       key={index}
@@ -110,21 +140,56 @@ export default function AccountsScreen() {
         </Text>
       </View>
       <View style={styles.accountAmountContainer}>
-        <Text style={styles.accountAmount}>${account.current_balance?.toFixed(2) || '0.00'}</Text>
+        <Text style={styles.accountAmount}>${formatCurrency(account.current_balance, 2)}</Text>
         <Text style={styles.accountLabel}>Balance</Text>
       </View>
     </View>
   );
 
-  const displayedAccounts = accounts;
-  const totalBalance = accounts.reduce((sum, account) => sum + (account.current_balance || 0), 0);
-  const totalMinimumPayment = accounts.reduce((sum, account) => sum + (account.minimum_payment || 0), 0);
+  const getSortedAccounts = () => {
+    try {
+      return [...accounts].sort((a, b) => {
+        if (sortOrder === 'high-to-low') {
+          return b.current_balance - a.current_balance;
+        } else {
+          return a.current_balance - b.current_balance;
+        }
+      });
+    } catch (error) {
+      console.error('Error sorting accounts:', error);
+      return accounts;
+    }
+  };
+
+  const displayedAccounts = getSortedAccounts();
+  const totalBalance = displayedAccounts.reduce((sum, account) => sum + (account.current_balance || 0), 0);
+  const totalMinimumPayment = displayedAccounts.reduce((sum, account) => sum + (account.minimum_payment || 0), 0);
 
   return (
     <View style={styles.container}>
       {/* Top Navbar */}
       <View style={styles.navbar}>
         <Text style={styles.navbarTitle}>Accounts</Text>
+        {isLoggedIn && (
+          <View style={styles.navbarIcons}>
+            <TouchableOpacity 
+              style={styles.iconButton} 
+              onPress={handleAdd}
+              hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+            >
+              <Ionicons name="add" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+            {accounts.length > 0 && (
+              <TouchableOpacity 
+                style={styles.iconButton} 
+                onPress={handleSort}
+                hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+              >
+                <Ionicons name="swap-vertical" size={22} color="#FFFFFF" />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
       </View>
 
       {/* Content Area */}
@@ -158,13 +223,13 @@ export default function AccountsScreen() {
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Total Balance</Text>
                     <Text style={styles.summaryAmount}>
-                      ${totalBalance.toFixed(2)}
+                      ${formatCurrency(totalBalance, 2)}
                     </Text>
                   </View>
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Total Minimum Payment</Text>
                     <Text style={styles.summaryAmountSecondary}>
-                      ${totalMinimumPayment.toFixed(2)}
+                      ${formatCurrency(totalMinimumPayment, 2)}
                     </Text>
                   </View>
                 </View>
@@ -194,7 +259,7 @@ const styles = StyleSheet.create({
   
   // Navbar Styles
   navbar: {
-    height: 44,
+    height: 56,
     backgroundColor: '#0C1C17',
     flexDirection: 'row',
     alignItems: 'center',
@@ -203,9 +268,20 @@ const styles = StyleSheet.create({
   },
   navbarTitle: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: 'bold',
     fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
+  },
+  navbarIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  iconButton: {
+    minWidth: 32,
+    minHeight: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   // Content Styles
