@@ -213,13 +213,6 @@ export default function MyAccountScreen() {
               : 'Sign in to access your financial data'}
           </Text>
 
-          <View style={styles.warningBox}>
-            <Text style={styles.warningTitle}>⚠️ Not Logged In</Text>
-            <Text style={styles.warningText}>
-              You need to sign in to see your financial data. The dashboard will show $0 until you log in.
-            </Text>
-          </View>
-
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email</Text>
             <TextInput
@@ -227,7 +220,7 @@ export default function MyAccountScreen() {
               value={email}
               onChangeText={setEmail}
               placeholder="your@email.com"
-              placeholderTextColor={colors.subtextGray}
+              placeholderTextColor="#666666"
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -242,7 +235,7 @@ export default function MyAccountScreen() {
               value={password}
               onChangeText={setPassword}
               placeholder="••••••••"
-              placeholderTextColor={colors.subtextGray}
+              placeholderTextColor="#666666"
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
@@ -348,25 +341,6 @@ const styles = StyleSheet.create({
     color: colors.subtextGray,
     marginBottom: 24,
   },
-  warningBox: {
-    backgroundColor: 'rgba(255, 194, 71, 0.1)',
-    borderWidth: 1,
-    borderColor: colors.yellow,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-  },
-  warningTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.yellow,
-    marginBottom: 8,
-  },
-  warningText: {
-    fontSize: 14,
-    color: colors.subtextGray,
-    lineHeight: 20,
-  },
   infoBox: {
     backgroundColor: 'rgba(46, 255, 139, 0.1)',
     borderWidth: 1,
@@ -397,9 +371,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(46, 255, 139, 0.05)',
     borderWidth: 1,
-    borderColor: 'rgba(46, 255, 139, 0.3)',
+    borderColor: 'rgba(46, 255, 139, 0.2)',
     borderRadius: 12,
     padding: 14,
     fontSize: 16,

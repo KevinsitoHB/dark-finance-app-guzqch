@@ -116,6 +116,7 @@ export default function PlanningScreen() {
       setMonthlyPayments(payments);
       
       // Simple payoff year calculation (assuming constant payments)
+      // Only calculate if there are actual payments being made
       if (payments > 0 && debt > 0) {
         const months = Math.ceil(debt / payments);
         const years = Math.floor(months / 12);
@@ -268,7 +269,7 @@ export default function PlanningScreen() {
                 <Text style={styles.summaryLabel}>Accounts</Text>
               </View>
               <View style={styles.summaryItem}>
-                <Text style={styles.summaryValue}>{payoffYear || '—'}</Text>
+                <Text style={styles.summaryValue}>{payoffYear > 0 ? payoffYear : '$0'}</Text>
                 <Text style={styles.summaryLabel}>Payoff Year</Text>
               </View>
               <View style={styles.summaryItem}>
@@ -320,7 +321,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingTop: 24,
+    paddingBottom: 16,
     backgroundColor: colors.background,
   },
   headerTitle: {

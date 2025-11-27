@@ -291,7 +291,7 @@ export default function EditBillScreen() {
               <Text style={[styles.dateButtonText, !dueDate && styles.dateButtonPlaceholder]}>
                 {formatDate(dueDate)}
               </Text>
-              <Ionicons name="calendar-outline" size={20} color="#FFFFFF" />
+              <Ionicons name="calendar-outline" size={20} color={colors.green} />
             </TouchableOpacity>
           </View>
 
@@ -327,11 +327,13 @@ const styles = StyleSheet.create({
   // Navbar Styles
   navbar: {
     height: 56,
-    backgroundColor: '#0C1C17',
+    backgroundColor: colors.background,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(46, 255, 139, 0.1)',
   },
   backButton: {
     minWidth: 32,
@@ -352,13 +354,13 @@ const styles = StyleSheet.create({
     minHeight: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#4A90E2',
+    backgroundColor: colors.green,
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
   saveButtonText: {
-    color: '#FFFFFF',
+    color: colors.background,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -393,7 +395,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   sectionTitle: {
-    color: '#888888',
+    color: colors.green,
     fontSize: 14,
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -406,15 +408,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    color: '#888888',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '500',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#1A2F1A',
+    backgroundColor: 'rgba(46, 255, 139, 0.05)',
     borderWidth: 1,
-    borderColor: '#2A3F2A',
+    borderColor: 'rgba(46, 255, 139, 0.2)',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -426,15 +428,15 @@ const styles = StyleSheet.create({
   amountInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1A2F1A',
+    backgroundColor: 'rgba(46, 255, 139, 0.05)',
     borderWidth: 1,
-    borderColor: '#2A3F2A',
+    borderColor: 'rgba(46, 255, 139, 0.2)',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
   currencySymbol: {
-    color: '#FFFFFF',
+    color: colors.green,
     fontSize: 18,
     fontWeight: '600',
     marginRight: 8,
@@ -452,9 +454,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#1A2F1A',
+    backgroundColor: 'rgba(46, 255, 139, 0.05)',
     borderWidth: 1,
-    borderColor: '#2A3F2A',
+    borderColor: 'rgba(46, 255, 139, 0.2)',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -472,7 +474,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF4D4D',
+    backgroundColor: colors.red,
     borderRadius: 12,
     paddingVertical: 16,
     marginTop: 24,

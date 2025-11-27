@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, View, Alert, Text } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import CustomHeader from '@/components/CustomHeader';
 import FinancialOverview from '@/components/FinancialOverview';
@@ -13,7 +13,6 @@ export default function HomeScreen() {
   const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [fixedBillsTotal, setFixedBillsTotal] = useState(0);
   const [totalAccountsDebt, setTotalAccountsDebt] = useState(0);
-  const [debugInfo, setDebugInfo] = useState('');
 
   useEffect(() => {
     console.log('=== HomeScreen mounted ===');
@@ -58,19 +57,16 @@ export default function HomeScreen() {
 
       if (userError) {
         console.error('User error:', userError);
-        setDebugInfo(`Auth Error: ${userError.message}`);
         throw userError;
       }
 
       if (!user) {
-        console.log('❌ No user logged in - this is the problem!');
-        setDebugInfo('No user logged in. Please implement authentication.');
+        console.log('❌ No user logged in');
         setMonthlyIncome(0);
         return;
       }
 
       console.log('✅ User authenticated:', user.id);
-      setDebugInfo(`User: ${user.email || user.id}`);
 
       // Fetch income data
       console.log('Querying FixedIncome table for user:', user.id);
@@ -208,13 +204,6 @@ export default function HomeScreen() {
       >
         <CustomHeader title="Dashboard" />
         
-        {/* Debug Info Banner */}
-        {debugInfo && (
-          <View style={styles.debugBanner}>
-            <Text style={styles.debugText}>🔍 Debug: {debugInfo}</Text>
-          </View>
-        )}
-        
         <FinancialOverview 
           monthlyIncome={monthlyIncome}
           fixedBillsTotal={fixedBillsTotal}
@@ -246,19 +235,5 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 40,
-  },
-  debugBanner: {
-    backgroundColor: 'rgba(255, 194, 71, 0.2)',
-    borderWidth: 1,
-    borderColor: colors.yellow,
-    borderRadius: 8,
-    padding: 12,
-    marginHorizontal: 16,
-    marginBottom: 16,
-  },
-  debugText: {
-    color: colors.yellow,
-    fontSize: 12,
-    fontWeight: '600',
   },
 });
