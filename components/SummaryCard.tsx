@@ -25,36 +25,53 @@ export default function SummaryCard({
   subtext,
   onPress,
 }: SummaryCardProps) {
-  const CardContent = (
-    <View style={[styles.card, { backgroundColor, borderColor }]}>
-      <View style={styles.contentContainer}>
-        <View style={[styles.iconCircle, { backgroundColor: `${iconColor}30` }]}>
-          <IconSymbol
-            ios_icon_name={iconName}
-            android_material_icon_name={iconName}
-            size={28}
-            color={iconColor}
-          />
+  try {
+    const CardContent = (
+      <View style={[styles.card, { backgroundColor, borderColor }]}>
+        <View style={styles.contentContainer}>
+          <View style={[styles.iconCircle, { backgroundColor: `${iconColor}30` }]}>
+            <IconSymbol
+              ios_icon_name={iconName}
+              android_material_icon_name={iconName}
+              size={28}
+              color={iconColor}
+            />
+          </View>
+          <Text style={[styles.value, { color: valueColor }]}>{value}</Text>
+          <Text style={styles.subtext} numberOfLines={2}>{subtext}</Text>
         </View>
-        <Text style={[styles.value, { color: valueColor }]}>{value}</Text>
-        <Text style={styles.subtext} numberOfLines={2}>{subtext}</Text>
       </View>
-    </View>
-  );
+    );
 
-  if (onPress) {
+    if (onPress) {
+      return (
+        <TouchableOpacity
+          style={styles.touchable}
+          onPress={() => {
+            try {
+              onPress();
+            } catch (error) {
+              console.error('Error in SummaryCard onPress:', error);
+            }
+          }}
+          activeOpacity={0.7}
+        >
+          {CardContent}
+        </TouchableOpacity>
+      );
+    }
+
+    return <View style={styles.touchable}>{CardContent}</View>;
+  } catch (error) {
+    console.error('Error rendering SummaryCard:', error);
     return (
-      <TouchableOpacity
-        style={styles.touchable}
-        onPress={onPress}
-        activeOpacity={0.7}
-      >
-        {CardContent}
-      </TouchableOpacity>
+      <View style={styles.touchable}>
+        <View style={[styles.card, { backgroundColor, borderColor }]}>
+          <Text style={styles.errorText}>Error loading card</Text>
+        </View>
+      </View>
     );
   }
-
-  return <View style={styles.touchable}>{CardContent}</View>;
 }
 
 const styles = StyleSheet.create({
@@ -101,6 +118,12 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: colors.subtextGray,
     lineHeight: 14,
+    textAlign: 'center',
+  },
+  errorText: {
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    color: colors.red,
     textAlign: 'center',
   },
 });

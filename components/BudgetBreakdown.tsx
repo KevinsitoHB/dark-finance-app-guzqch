@@ -18,86 +18,96 @@ export default function BudgetBreakdown({
   remainingAfterBills = 0,
   totalAccountsDebt = 0,
 }: BudgetBreakdownProps) {
-  // Calculate percentages for the progress bar
-  const percentSpent = monthlyIncome > 0 ? (fixedBillsTotal / monthlyIncome) * 100 : 0;
-  const percentAvailable = monthlyIncome > 0 ? (remainingAfterBills / monthlyIncome) * 100 : 0;
-  
-  // Calculate Debt-to-Income ratio (DTI)
-  const dtiRatio = monthlyIncome > 0 ? (totalAccountsDebt / (monthlyIncome * 12)) * 100 : 0;
+  try {
+    // Calculate percentages for the progress bar
+    const percentSpent = monthlyIncome > 0 ? (fixedBillsTotal / monthlyIncome) * 100 : 0;
+    const percentAvailable = monthlyIncome > 0 ? (remainingAfterBills / monthlyIncome) * 100 : 0;
+    
+    // Calculate Debt-to-Income ratio (DTI)
+    const dtiRatio = monthlyIncome > 0 ? (totalAccountsDebt / (monthlyIncome * 12)) * 100 : 0;
 
-  return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Budget Breakdown</Text>
-      
-      {/* Budget Cards Container */}
-      <View style={styles.cardsContainer}>
-        <BudgetCard
-          backgroundColor="rgba(255, 77, 77, 0.08)"
-          borderColor={colors.red}
-          label="Fixed Bills:"
-          value={`$${formatCurrency(fixedBillsTotal)}`}
-          valueColor={colors.red}
-          dotColor={colors.red}
-        />
-        <BudgetCard
-          backgroundColor="rgba(255, 194, 71, 0.08)"
-          borderColor={colors.yellow}
-          label="Remaining:"
-          value={`$${formatCurrency(remainingAfterBills)}`}
-          valueColor={colors.yellow}
-          dotColor={colors.yellow}
-        />
-        <BudgetCard
-          backgroundColor="rgba(46, 255, 139, 0.08)"
-          borderColor={colors.green}
-          label="Income:"
-          value={`$${formatCurrency(monthlyIncome)}`}
-          valueColor={colors.green}
-          dotColor={colors.green}
-        />
-      </View>
-
-      {/* Progress Bar Section */}
-      <View style={styles.progressSection}>
-        <View style={styles.progressBarContainer}>
-          {/* Red section for spent */}
-          <View 
-            style={[
-              styles.progressSegment, 
-              { 
-                width: `${percentSpent}%`, 
-                backgroundColor: colors.red,
-                borderTopLeftRadius: 8,
-                borderBottomLeftRadius: 8,
-              }
-            ]} 
-          />
-          {/* Green section for available */}
-          <View 
-            style={[
-              styles.progressSegment, 
-              { 
-                width: `${percentAvailable}%`, 
-                backgroundColor: colors.green,
-                borderTopRightRadius: 8,
-                borderBottomRightRadius: 8,
-              }
-            ]} 
-          />
-        </View>
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Budget Breakdown</Text>
         
-        {/* Progress Labels */}
-        <View style={styles.progressLabels}>
-          <Text style={styles.progressLabel}>
-            {percentSpent.toFixed(0)}% Spent, DTI {dtiRatio.toFixed(0)}%
-          </Text>
-          <Text style={styles.progressLabel}>
-            {percentAvailable.toFixed(0)}% available
-          </Text>
+        {/* Budget Cards Container */}
+        <View style={styles.cardsContainer}>
+          <BudgetCard
+            backgroundColor="rgba(255, 77, 77, 0.08)"
+            borderColor={colors.red}
+            label="Fixed Bills:"
+            value={`$${formatCurrency(fixedBillsTotal)}`}
+            valueColor={colors.red}
+            dotColor={colors.red}
+          />
+          <BudgetCard
+            backgroundColor="rgba(255, 194, 71, 0.08)"
+            borderColor={colors.yellow}
+            label="Remaining:"
+            value={`$${formatCurrency(remainingAfterBills)}`}
+            valueColor={colors.yellow}
+            dotColor={colors.yellow}
+          />
+          <BudgetCard
+            backgroundColor="rgba(46, 255, 139, 0.08)"
+            borderColor={colors.green}
+            label="Income:"
+            value={`$${formatCurrency(monthlyIncome)}`}
+            valueColor={colors.green}
+            dotColor={colors.green}
+          />
+        </View>
+
+        {/* Progress Bar Section */}
+        <View style={styles.progressSection}>
+          <View style={styles.progressBarContainer}>
+            {/* Red section for spent */}
+            <View 
+              style={[
+                styles.progressSegment, 
+                { 
+                  width: `${percentSpent}%`, 
+                  backgroundColor: colors.red,
+                  borderTopLeftRadius: 8,
+                  borderBottomLeftRadius: 8,
+                }
+              ]} 
+            />
+            {/* Green section for available */}
+            <View 
+              style={[
+                styles.progressSegment, 
+                { 
+                  width: `${percentAvailable}%`, 
+                  backgroundColor: colors.green,
+                  borderTopRightRadius: 8,
+                  borderBottomRightRadius: 8,
+                }
+              ]} 
+            />
+          </View>
+          
+          {/* Progress Labels */}
+          <View style={styles.progressLabels}>
+            <Text style={styles.progressLabel}>
+              {percentSpent.toFixed(0)}% Spent, DTI {dtiRatio.toFixed(0)}%
+            </Text>
+            <Text style={styles.progressLabel}>
+              {percentAvailable.toFixed(0)}% available
+            </Text>
+          </View>
         </View>
       </View>
-    </View>
-  );
+    );
+  } catch (error) {
+    console.error('Error rendering BudgetBreakdown:', error);
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Budget Breakdown</Text>
+        <Text style={styles.errorText}>Unable to load budget data</Text>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -148,5 +158,12 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: colors.subtextGray,
     fontWeight: '500',
+  },
+  errorText: {
+    fontSize: 14,
+    fontFamily: fonts.regular,
+    color: colors.red,
+    textAlign: 'center',
+    marginTop: 20,
   },
 });

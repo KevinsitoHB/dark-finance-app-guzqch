@@ -26,15 +26,27 @@ export default function FinancialOverview({
   const [showIncomeModal, setShowIncomeModal] = useState(false);
 
   useEffect(() => {
-    console.log('FinancialOverview mounted');
-    fetchAccountsData();
+    try {
+      console.log('FinancialOverview mounted');
+      fetchAccountsData().catch((error) => {
+        console.error('Error in initial fetchAccountsData:', error);
+      });
+    } catch (error) {
+      console.error('Error in FinancialOverview useEffect:', error);
+    }
   }, []);
 
   // Refresh accounts data when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
-      console.log('FinancialOverview focused, refreshing accounts data...');
-      fetchAccountsData();
+      try {
+        console.log('FinancialOverview focused, refreshing accounts data...');
+        fetchAccountsData().catch((error) => {
+          console.error('Error in focus fetchAccountsData:', error);
+        });
+      } catch (error) {
+        console.error('Error in useFocusEffect callback:', error);
+      }
     }, [])
   );
 
@@ -95,8 +107,13 @@ export default function FinancialOverview({
   };
 
   const handleIncomeCardPress = () => {
-    console.log('Income card pressed, opening modal');
-    setShowIncomeModal(true);
+    try {
+      console.log('Income card pressed, opening modal');
+      setShowIncomeModal(true);
+    } catch (error) {
+      console.error('Error opening income modal:', error);
+      Alert.alert('Error', 'Failed to open income editor');
+    }
   };
 
   const handleFixedBillsCardPress = () => {
@@ -110,8 +127,13 @@ export default function FinancialOverview({
   };
 
   const handleIncomeSave = (value: number) => {
-    console.log('Income saved with value:', value);
-    onIncomeUpdate(value);
+    try {
+      console.log('Income saved with value:', value);
+      onIncomeUpdate(value);
+    } catch (error) {
+      console.error('Error saving income:', error);
+      Alert.alert('Error', 'Failed to save income');
+    }
   };
 
   const remainingAfterBills = monthlyIncome - fixedBillsTotal;
@@ -171,7 +193,13 @@ export default function FinancialOverview({
 
       <CurrencyInputModal
         visible={showIncomeModal}
-        onClose={() => setShowIncomeModal(false)}
+        onClose={() => {
+          try {
+            setShowIncomeModal(false);
+          } catch (error) {
+            console.error('Error closing modal:', error);
+          }
+        }}
         onSave={handleIncomeSave}
         initialValue={monthlyIncome}
       />

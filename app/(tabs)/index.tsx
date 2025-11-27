@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import CustomHeader from '@/components/CustomHeader';
 import FinancialOverview from '@/components/FinancialOverview';
@@ -15,15 +15,27 @@ export default function HomeScreen() {
   const [totalAccountsDebt, setTotalAccountsDebt] = useState(0);
 
   useEffect(() => {
-    console.log('=== HomeScreen mounted ===');
-    fetchFinancialData();
+    try {
+      console.log('=== HomeScreen mounted ===');
+      fetchFinancialData().catch((error) => {
+        console.error('Error in initial fetchFinancialData:', error);
+      });
+    } catch (error) {
+      console.error('Error in HomeScreen useEffect:', error);
+    }
   }, []);
 
   // Refresh data when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
-      console.log('=== Home screen focused, refreshing financial data ===');
-      fetchFinancialData();
+      try {
+        console.log('=== Home screen focused, refreshing financial data ===');
+        fetchFinancialData().catch((error) => {
+          console.error('Error in focus fetchFinancialData:', error);
+        });
+      } catch (error) {
+        console.error('Error in useFocusEffect callback:', error);
+      }
     }, [])
   );
 
@@ -31,13 +43,23 @@ export default function HomeScreen() {
     try {
       console.log('Starting fetchFinancialData...');
       await Promise.all([
-        fetchMonthlyIncome(),
-        fetchFixedBillsTotal(),
-        fetchAccountsDebt(),
+        fetchMonthlyIncome().catch((error) => {
+          console.error('Error in fetchMonthlyIncome:', error);
+          return null;
+        }),
+        fetchFixedBillsTotal().catch((error) => {
+          console.error('Error in fetchFixedBillsTotal:', error);
+          return null;
+        }),
+        fetchAccountsDebt().catch((error) => {
+          console.error('Error in fetchAccountsDebt:', error);
+          return null;
+        }),
       ]);
       console.log('Finished fetchFinancialData');
     } catch (error) {
       console.error('Error in fetchFinancialData:', error);
+      Alert.alert('Error', 'Failed to load financial data. Please try again.');
     }
   };
 
@@ -189,8 +211,12 @@ export default function HomeScreen() {
   };
 
   const handleIncomeUpdate = (newIncome: number) => {
-    console.log('Income updated to:', newIncome);
-    setMonthlyIncome(newIncome);
+    try {
+      console.log('Income updated to:', newIncome);
+      setMonthlyIncome(newIncome);
+    } catch (error) {
+      console.error('Error updating income:', error);
+    }
   };
 
   const remainingAfterBills = monthlyIncome - fixedBillsTotal;

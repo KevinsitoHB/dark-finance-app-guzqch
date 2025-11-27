@@ -6,12 +6,19 @@
  * @returns Formatted string with commas
  */
 export function formatCurrency(value: number, decimals: number = 0): string {
-  if (isNaN(value)) return '0';
-  
-  return value.toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
+  try {
+    if (value === null || value === undefined || isNaN(value)) {
+      return '0';
+    }
+    
+    return value.toLocaleString('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+  } catch (error) {
+    console.error('Error formatting currency:', error, 'Value:', value);
+    return '0';
+  }
 }
 
 /**
@@ -21,10 +28,17 @@ export function formatCurrency(value: number, decimals: number = 0): string {
  * @returns Formatted string with commas
  */
 export function formatNumber(value: number, decimals: number = 0): string {
-  if (isNaN(value)) return '0';
-  
-  return value.toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
+  try {
+    if (value === null || value === undefined || isNaN(value)) {
+      return '0';
+    }
+    
+    return value.toLocaleString('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+  } catch (error) {
+    console.error('Error formatting number:', error, 'Value:', value);
+    return '0';
+  }
 }

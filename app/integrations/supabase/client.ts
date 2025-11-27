@@ -31,6 +31,15 @@ try {
   });
 } catch (error) {
   console.error('Failed to initialize Supabase client:', error);
+  // Create a fallback instance to prevent null reference errors
+  supabaseInstance = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth: {
+      storage: AsyncStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
+  });
 }
 
 export const supabase = supabaseInstance!;

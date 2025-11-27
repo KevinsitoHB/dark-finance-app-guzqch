@@ -17,80 +17,100 @@ export default function MonthlyCalendar() {
   const [nextMonth] = useState(new Date(new Date().setMonth(new Date().getMonth() + 1)));
 
   const getDaysInMonth = (date: Date): CalendarDay[] => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const today = new Date();
-    const isCurrentMonth = today.getMonth() === month && today.getFullYear() === year;
+    try {
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const today = new Date();
+      const isCurrentMonth = today.getMonth() === month && today.getFullYear() === year;
 
-    const days: CalendarDay[] = [];
+      const days: CalendarDay[] = [];
 
-    for (let i = 0; i < firstDay; i++) {
-      days.push({ day: 0, isToday: false });
+      for (let i = 0; i < firstDay; i++) {
+        days.push({ day: 0, isToday: false });
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        days.push({
+          day,
+          isToday: isCurrentMonth && day === today.getDate(),
+        });
+      }
+
+      return days;
+    } catch (error) {
+      console.error('Error generating calendar days:', error);
+      return [];
     }
-
-    for (let day = 1; day <= daysInMonth; day++) {
-      days.push({
-        day,
-        isToday: isCurrentMonth && day === today.getDate(),
-      });
-    }
-
-    return days;
   };
 
   const renderMonth = (date: Date, isCurrent: boolean) => {
-    const days = getDaysInMonth(date);
-    const monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    try {
+      const days = getDaysInMonth(date);
+      const monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-    return (
-      <View style={styles.monthCard}>
-        <View style={styles.monthHeader}>
-          <Text style={styles.monthTitle}>{monthName}</Text>
-          <View style={[styles.badge, isCurrent ? styles.currentBadge : styles.nextBadge]}>
-            <Text style={styles.badgeText}>{isCurrent ? 'CURRENT' : 'NEXT'}</Text>
+      return (
+        <View style={styles.monthCard}>
+          <View style={styles.monthHeader}>
+            <Text style={styles.monthTitle}>{monthName}</Text>
+            <View style={[styles.badge, isCurrent ? styles.currentBadge : styles.nextBadge]}>
+              <Text style={styles.badgeText}>{isCurrent ? 'CURRENT' : 'NEXT'}</Text>
+            </View>
+          </View>
+
+          <View style={styles.weekDaysRow}>
+            {weekDays.map((day, index) => (
+              <Text key={index} style={styles.weekDay}>
+                {day}
+              </Text>
+            ))}
+          </View>
+
+          <View style={styles.daysGrid}>
+            {days.map((dayData, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.dayCell,
+                  dayData.isToday && styles.todayCell,
+                ]}
+                disabled={dayData.day === 0}
+              >
+                {dayData.day > 0 && (
+                  <Text style={[styles.dayText, dayData.isToday && styles.todayText]}>
+                    {dayData.day}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
-
-        <View style={styles.weekDaysRow}>
-          {weekDays.map((day, index) => (
-            <Text key={index} style={styles.weekDay}>
-              {day}
-            </Text>
-          ))}
-        </View>
-
-        <View style={styles.daysGrid}>
-          {days.map((dayData, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.dayCell,
-                dayData.isToday && styles.todayCell,
-              ]}
-              disabled={dayData.day === 0}
-            >
-              {dayData.day > 0 && (
-                <Text style={[styles.dayText, dayData.isToday && styles.todayText]}>
-                  {dayData.day}
-                </Text>
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-    );
+      );
+    } catch (error) {
+      console.error('Error rendering month:', error);
+      return null;
+    }
   };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Payment Calendar</Text>
-      {renderMonth(currentMonth, true)}
-      {renderMonth(nextMonth, false)}
-    </View>
-  );
+  try {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.sectionTitle}>Payment Calendar</Text>
+        {renderMonth(currentMonth, true)}
+        {renderMonth(nextMonth, false)}
+      </View>
+    );
+  } catch (error) {
+    console.error('Error rendering MonthlyCalendar:', error);
+    return (
+      <View style={styles.container}>
+        <Text style={styles.sectionTitle}>Payment Calendar</Text>
+        <Text style={styles.errorText}>Unable to load calendar</Text>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -182,5 +202,12 @@ const styles = StyleSheet.create({
   todayText: {
     fontWeight: '700',
     fontFamily: fonts.bold,
+  },
+  errorText: {
+    fontSize: 14,
+    fontFamily: fonts.regular,
+    color: colors.red,
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
