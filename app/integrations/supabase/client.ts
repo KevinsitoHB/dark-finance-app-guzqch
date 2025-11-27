@@ -23,7 +23,11 @@ try {
 
   // Log when session changes for debugging
   supabaseInstance.auth.onAuthStateChange((event, session) => {
-    console.log('Auth state changed:', event, session ? 'Session exists' : 'No session');
+    try {
+      console.log('Auth state changed:', event, session ? 'Session exists' : 'No session');
+    } catch (error) {
+      console.error('Error in auth state change handler:', error);
+    }
   });
 } catch (error) {
   console.error('Failed to initialize Supabase client:', error);

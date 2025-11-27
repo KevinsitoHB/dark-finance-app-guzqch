@@ -34,28 +34,40 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (error) {
-      console.error('Font loading error:', error);
+    try {
+      if (error) {
+        console.error('Font loading error:', error);
+      }
+    } catch (err) {
+      console.error('Error in font loading effect:', err);
     }
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync().catch((err) => {
-        console.error('Error hiding splash screen:', err);
-      });
+    try {
+      if (loaded) {
+        SplashScreen.hideAsync().catch((err) => {
+          console.error('Error hiding splash screen:', err);
+        });
+      }
+    } catch (err) {
+      console.error('Error in splash screen effect:', err);
     }
   }, [loaded]);
 
   React.useEffect(() => {
-    if (
-      !networkState.isConnected &&
-      networkState.isInternetReachable === false
-    ) {
-      Alert.alert(
-        "🔌 You are offline",
-        "You can keep using the app! Your changes will be saved locally and synced when you are back online."
-      );
+    try {
+      if (
+        !networkState.isConnected &&
+        networkState.isInternetReachable === false
+      ) {
+        Alert.alert(
+          "🔌 You are offline",
+          "You can keep using the app! Your changes will be saved locally and synced when you are back online."
+        );
+      }
+    } catch (err) {
+      console.error('Error in network state effect:', err);
     }
   }, [networkState.isConnected, networkState.isInternetReachable]);
 

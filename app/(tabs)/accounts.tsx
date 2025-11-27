@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Platform, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '@/styles/commonStyles';
@@ -207,7 +207,13 @@ export default function AccountsScreen() {
             </Text>
             <TouchableOpacity
               style={styles.signInButton}
-              onPress={() => router.push('/(tabs)/myaccount')}
+              onPress={() => {
+                try {
+                  router.push('/(tabs)/myaccount');
+                } catch (error) {
+                  console.error('Error navigating to my account:', error);
+                }
+              }}
             >
               <Text style={styles.signInButtonText}>Go to My Account</Text>
             </TouchableOpacity>
@@ -259,12 +265,13 @@ const styles = StyleSheet.create({
   
   // Navbar Styles
   navbar: {
-    height: 56,
-    backgroundColor: '#0C1C17',
+    height: 80,
+    backgroundColor: colors.background,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
+    paddingTop: 24,
   },
   navbarTitle: {
     color: '#FFFFFF',

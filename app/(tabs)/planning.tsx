@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Platform, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Platform, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
@@ -68,6 +68,10 @@ export default function PlanningScreen() {
       console.error('Error checking auth:', error);
       setIsLoggedIn(false);
       setAccounts([]);
+      setTotalDebt(0);
+      setTotalAccounts(0);
+      setPayoffYear(0);
+      setMonthlyPayments(0);
     } finally {
       setLoading(false);
     }
@@ -83,112 +87,140 @@ export default function PlanningScreen() {
 
       if (error) {
         console.log('Error fetching accounts:', error);
+        setAccounts([]);
+        setTotalDebt(0);
+        setTotalAccounts(0);
+        setPayoffYear(0);
+        setMonthlyPayments(0);
       } else {
         setAccounts(data || []);
         calculateTotals(data || []);
       }
     } catch (error) {
       console.log('Error in fetchAccounts:', error);
+      setAccounts([]);
+      setTotalDebt(0);
+      setTotalAccounts(0);
+      setPayoffYear(0);
+      setMonthlyPayments(0);
     }
   };
 
   const calculateTotals = (accountsData: Account[]) => {
-    const debt = accountsData.reduce((sum, acc) => sum + (acc.current_balance || 0), 0);
-    const payments = accountsData.reduce((sum, acc) => sum + (acc.my_monthly_pay || 0), 0);
-    
-    setTotalDebt(debt);
-    setTotalAccounts(accountsData.length);
-    setMonthlyPayments(payments);
-    
-    // Simple payoff year calculation (assuming constant payments)
-    if (payments > 0 && debt > 0) {
-      const months = Math.ceil(debt / payments);
-      const years = Math.floor(months / 12);
-      setPayoffYear(new Date().getFullYear() + years);
-    } else {
+    try {
+      const debt = accountsData.reduce((sum, acc) => sum + (acc.current_balance || 0), 0);
+      const payments = accountsData.reduce((sum, acc) => sum + (acc.my_monthly_pay || 0), 0);
+      
+      setTotalDebt(debt);
+      setTotalAccounts(accountsData.length);
+      setMonthlyPayments(payments);
+      
+      // Simple payoff year calculation (assuming constant payments)
+      if (payments > 0 && debt > 0) {
+        const months = Math.ceil(debt / payments);
+        const years = Math.floor(months / 12);
+        setPayoffYear(new Date().getFullYear() + years);
+      } else {
+        setPayoffYear(0);
+      }
+    } catch (error) {
+      console.error('Error calculating totals:', error);
+      setTotalDebt(0);
+      setTotalAccounts(0);
       setPayoffYear(0);
+      setMonthlyPayments(0);
     }
   };
 
   const calculateTimeToPayOff = (account: Account) => {
-    if (account.my_monthly_pay <= 0 || account.current_balance <= 0) {
+    try {
+      if (account.my_monthly_pay <= 0 || account.current_balance <= 0) {
+        return { years: 0, months: 0 };
+      }
+      
+      const months = Math.ceil(account.current_balance / account.my_monthly_pay);
+      const years = Math.floor(months / 12);
+      const remainingMonths = months % 12;
+      
+      return { years, months: remainingMonths };
+    } catch (error) {
+      console.error('Error calculating time to pay off:', error);
       return { years: 0, months: 0 };
     }
-    
-    const months = Math.ceil(account.current_balance / account.my_monthly_pay);
-    const years = Math.floor(months / 12);
-    const remainingMonths = months % 12;
-    
-    return { years, months: remainingMonths };
   };
 
   const renderAccountCard = (account: Account, index: number) => {
-    const timeToPayOff = calculateTimeToPayOff(account);
-    const accountType = account.acct_type || 'Credit Card';
-    
-    return (
-      <View key={index} style={styles.accountCard}>
-        <View style={styles.accountHeader}>
-          <View style={styles.accountIconContainer}>
-            <View style={styles.accountIcon}>
-              <Ionicons name="card-outline" size={24} color="#FF6B6B" />
+    try {
+      const timeToPayOff = calculateTimeToPayOff(account);
+      const accountType = account.acct_type || 'Credit Card';
+      
+      return (
+        <View key={index} style={styles.accountCard}>
+          <View style={styles.accountHeader}>
+            <View style={styles.accountIconContainer}>
+              <View style={styles.accountIcon}>
+                <Ionicons name="card-outline" size={24} color="#FF6B6B" />
+              </View>
             </View>
+            <View style={styles.accountHeaderInfo}>
+              <Text style={styles.accountName}>{account.acct_name || 'Unnamed Account'}</Text>
+              <Text style={styles.accountType}>{accountType}</Text>
+            </View>
+            <Text style={styles.accountBalance}>${formatCurrency(account.current_balance, 2)}</Text>
           </View>
-          <View style={styles.accountHeaderInfo}>
-            <Text style={styles.accountName}>{account.acct_name || 'Unnamed Account'}</Text>
-            <Text style={styles.accountType}>{accountType}</Text>
-          </View>
-          <Text style={styles.accountBalance}>${formatCurrency(account.current_balance, 2)}</Text>
-        </View>
 
-        <View style={styles.timeToPayOffContainer}>
-          <Text style={styles.timeToPayOffLabel}>Time to Pay Off</Text>
-          <View style={styles.timeToPayOffValues}>
-            <View style={styles.timeValue}>
-              <Text style={styles.timeNumber}>{timeToPayOff.years}</Text>
-              <Text style={styles.timeLabel}>Years</Text>
-            </View>
-            <View style={styles.timeValue}>
-              <Text style={styles.timeNumber}>{timeToPayOff.months}</Text>
-              <Text style={styles.timeLabel}>Months</Text>
+          <View style={styles.timeToPayOffContainer}>
+            <Text style={styles.timeToPayOffLabel}>Time to Pay Off</Text>
+            <View style={styles.timeToPayOffValues}>
+              <View style={styles.timeValue}>
+                <Text style={styles.timeNumber}>{timeToPayOff.years}</Text>
+                <Text style={styles.timeLabel}>Years</Text>
+              </View>
+              <View style={styles.timeValue}>
+                <Text style={styles.timeNumber}>{timeToPayOff.months}</Text>
+                <Text style={styles.timeLabel}>Months</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.accountDetails}>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Minimum Payment:</Text>
-            <Text style={styles.detailValue}>${formatCurrency(account.minimum_payment)}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>My Monthly Payment:</Text>
-            <Text style={[styles.detailValue, styles.detailValueHighlight]}>
-              ${formatCurrency(account.my_monthly_pay)}
-            </Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>APR:</Text>
-            <Text style={styles.detailValue}>{(account.apr_interest || 0).toFixed(2)}%</Text>
-          </View>
-        </View>
-
-        {account.my_monthly_pay > account.minimum_payment && (
-          <View style={styles.strategyContainer}>
-            <View style={styles.strategyHeader}>
-              <Ionicons name="bulb" size={16} color="#FFC247" />
-              <Text style={styles.strategyTitle}>✨ AI Personalized Strategy</Text>
+          <View style={styles.accountDetails}>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Minimum Payment:</Text>
+              <Text style={styles.detailValue}>${formatCurrency(account.minimum_payment)}</Text>
             </View>
-            <View style={styles.strategyContent}>
-              <Ionicons name="trending-up" size={14} color="#FFFFFF" />
-              <Text style={styles.strategyText}>
-                Increase to ${formatCurrency(account.minimum_payment * 1.5)}/month to save $
-                {formatCurrency(account.current_balance * 0.15)} in interest
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>My Monthly Payment:</Text>
+              <Text style={[styles.detailValue, styles.detailValueHighlight]}>
+                ${formatCurrency(account.my_monthly_pay)}
               </Text>
             </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>APR:</Text>
+              <Text style={styles.detailValue}>{(account.apr_interest || 0).toFixed(2)}%</Text>
+            </View>
           </View>
-        )}
-      </View>
-    );
+
+          {account.my_monthly_pay > account.minimum_payment && (
+            <View style={styles.strategyContainer}>
+              <View style={styles.strategyHeader}>
+                <Ionicons name="bulb" size={16} color="#FFC247" />
+                <Text style={styles.strategyTitle}>✨ AI Personalized Strategy</Text>
+              </View>
+              <View style={styles.strategyContent}>
+                <Ionicons name="trending-up" size={14} color="#FFFFFF" />
+                <Text style={styles.strategyText}>
+                  Increase to ${formatCurrency(account.minimum_payment * 1.5)}/month to save $
+                  {formatCurrency(account.current_balance * 0.15)} in interest
+                </Text>
+              </View>
+            </View>
+          )}
+        </View>
+      );
+    } catch (error) {
+      console.error('Error rendering account card:', error);
+      return null;
+    }
   };
 
   return (
@@ -196,9 +228,6 @@ export default function PlanningScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Debt Overview</Text>
-        <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="square-outline" size={24} color="#4A90E2" />
-        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -215,7 +244,13 @@ export default function PlanningScreen() {
             </Text>
             <TouchableOpacity
               style={styles.signInButton}
-              onPress={() => router.push('/(tabs)/myaccount')}
+              onPress={() => {
+                try {
+                  router.push('/(tabs)/myaccount');
+                } catch (error) {
+                  console.error('Error navigating to my account:', error);
+                }
+              }}
             >
               <Text style={styles.signInButtonText}>Go to My Account</Text>
             </TouchableOpacity>
@@ -292,12 +327,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#FFFFFF',
-  },
-  headerButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
   },
 
   // Not Logged In State

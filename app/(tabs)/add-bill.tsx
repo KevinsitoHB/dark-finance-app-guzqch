@@ -67,12 +67,10 @@ export default function AddBillScreen() {
       }
 
       console.log('Bill inserted successfully:', data);
-      Alert.alert('Success', 'Bill added successfully', [
-        {
-          text: 'OK',
-          onPress: () => router.back(),
-        },
-      ]);
+      
+      // Navigate back to Fixed Bills tab and it will auto-refresh via useFocusEffect
+      router.replace('/(tabs)/fixedbills');
+      
     } catch (error) {
       console.error('Error in handleSave:', error);
       Alert.alert('Error', 'Failed to add bill. Please try again.');
@@ -111,7 +109,13 @@ export default function AddBillScreen() {
       {/* Top Navbar */}
       <View style={styles.navbar}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => {
+            try {
+              router.back();
+            } catch (error) {
+              console.error('Error navigating back:', error);
+            }
+          }}
           style={styles.backButton}
           hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
         >
@@ -175,7 +179,13 @@ export default function AddBillScreen() {
             <Text style={styles.label}>Due Date (Optional)</Text>
             <TouchableOpacity
               style={styles.dateButton}
-              onPress={() => setShowDatePicker(true)}
+              onPress={() => {
+                try {
+                  setShowDatePicker(true);
+                } catch (error) {
+                  console.error('Error showing date picker:', error);
+                }
+              }}
             >
               <Text style={[styles.dateButtonText, !dueDate && styles.dateButtonPlaceholder]}>
                 {formatDate(dueDate)}

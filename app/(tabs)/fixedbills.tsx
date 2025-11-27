@@ -276,7 +276,13 @@ export default function FixedBillsScreen() {
               styles.pillButton,
               activeTab === 'bills' && styles.pillButtonActive
             ]}
-            onPress={() => setActiveTab('bills')}
+            onPress={() => {
+              try {
+                setActiveTab('bills');
+              } catch (error) {
+                console.error('Error switching tab:', error);
+              }
+            }}
           >
             <Text style={[
               styles.pillButtonText,
@@ -290,7 +296,13 @@ export default function FixedBillsScreen() {
               styles.pillButton,
               activeTab === 'calculators' && styles.pillButtonActive
             ]}
-            onPress={() => setActiveTab('calculators')}
+            onPress={() => {
+              try {
+                setActiveTab('calculators');
+              } catch (error) {
+                console.error('Error switching tab:', error);
+              }
+            }}
           >
             <Text style={[
               styles.pillButtonText,
@@ -317,7 +329,13 @@ export default function FixedBillsScreen() {
             </Text>
             <TouchableOpacity
               style={styles.signInButton}
-              onPress={() => router.push('/(tabs)/myaccount')}
+              onPress={() => {
+                try {
+                  router.push('/(tabs)/myaccount');
+                } catch (error) {
+                  console.error('Error navigating to my account:', error);
+                }
+              }}
             >
               <Text style={styles.signInButtonText}>Go to My Account</Text>
             </TouchableOpacity>
@@ -365,12 +383,13 @@ const styles = StyleSheet.create({
   
   // Navbar Styles
   navbar: {
-    height: 56,
-    backgroundColor: '#0C1C17',
+    height: 80,
+    backgroundColor: colors.background,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
+    paddingTop: 24,
   },
   navbarTitle: {
     color: '#FFFFFF',
@@ -392,7 +411,7 @@ const styles = StyleSheet.create({
 
   // Pill Buttons Styles
   pillContainer: {
-    backgroundColor: '#0A1714',
+    backgroundColor: colors.background,
     flexDirection: 'row',
     paddingHorizontal: 8,
     paddingBottom: 20,

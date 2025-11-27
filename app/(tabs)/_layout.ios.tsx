@@ -1,8 +1,9 @@
 
+import React from 'react';
 import { Tabs } from 'expo-router/unstable-native-tabs';
+import { TouchableOpacity, StyleSheet, View } from 'react-native';
 import { colors } from '@/styles/commonStyles';
 import { GlassView } from 'expo-glass-effect';
-import { StyleSheet, View } from 'react-native';
 
 export default function TabLayout() {
   return (
@@ -93,6 +94,12 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="add-bill"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
         options={{
           href: null,
         }}

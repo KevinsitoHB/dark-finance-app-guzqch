@@ -98,12 +98,9 @@ export default function EditBillScreen() {
         throw error;
       }
 
-      Alert.alert('Success', 'Bill updated successfully', [
-        {
-          text: 'OK',
-          onPress: () => router.back(),
-        },
-      ]);
+      // Navigate back to Fixed Bills tab and it will auto-refresh via useFocusEffect
+      router.replace('/(tabs)/fixedbills');
+      
     } catch (error) {
       console.error('Error saving bill:', error);
       Alert.alert('Error', 'Failed to save changes. Please try again.');
@@ -146,12 +143,9 @@ export default function EditBillScreen() {
         throw error;
       }
 
-      Alert.alert('Success', 'Bill deleted successfully', [
-        {
-          text: 'OK',
-          onPress: () => router.back(),
-        },
-      ]);
+      // Navigate back to Fixed Bills tab and it will auto-refresh via useFocusEffect
+      router.replace('/(tabs)/fixedbills');
+      
     } catch (error) {
       console.error('Error deleting bill:', error);
       Alert.alert('Error', 'Failed to delete bill. Please try again.');
@@ -188,7 +182,13 @@ export default function EditBillScreen() {
       <View style={styles.container}>
         <View style={styles.navbar}>
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => {
+              try {
+                router.back();
+              } catch (error) {
+                console.error('Error navigating back:', error);
+              }
+            }}
             style={styles.backButton}
             hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
           >
@@ -210,7 +210,13 @@ export default function EditBillScreen() {
       {/* Top Navbar */}
       <View style={styles.navbar}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => {
+            try {
+              router.back();
+            } catch (error) {
+              console.error('Error navigating back:', error);
+            }
+          }}
           style={styles.backButton}
           hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
         >
@@ -224,7 +230,7 @@ export default function EditBillScreen() {
           hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
         >
           {saving ? (
-            <ActivityIndicator size="small" color="#4A90E2" />
+            <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
             <Text style={styles.saveButtonText}>Save</Text>
           )}
@@ -274,7 +280,13 @@ export default function EditBillScreen() {
             <Text style={styles.label}>Due Date (Optional)</Text>
             <TouchableOpacity
               style={styles.dateButton}
-              onPress={() => setShowDatePicker(true)}
+              onPress={() => {
+                try {
+                  setShowDatePicker(true);
+                } catch (error) {
+                  console.error('Error showing date picker:', error);
+                }
+              }}
             >
               <Text style={[styles.dateButtonText, !dueDate && styles.dateButtonPlaceholder]}>
                 {formatDate(dueDate)}
