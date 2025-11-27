@@ -23,15 +23,16 @@ export default function FloatingTabBar({ tabs }: FloatingTabBarProps) {
   const pathname = usePathname();
 
   const isActive = (route: string) => {
-    if (route === '/(tabs)/(home)/') {
-      return pathname === '/' || pathname.startsWith('/(tabs)/(home)');
+    // Handle dashboard/home route
+    if (route === '/(tabs)/') {
+      return pathname === '/' || pathname === '/(tabs)/' || pathname === '/(tabs)';
     }
     return pathname === route || pathname.startsWith(route);
   };
 
   const getIconForTab = (tabName: string) => {
     switch (tabName) {
-      case '(home)':
+      case 'index':
         return { ios: 'chart.bar.fill', android: 'dashboard' };
       case 'fixedbills':
         return { ios: 'receipt.fill', android: 'receipt' };
@@ -66,8 +67,7 @@ export default function FloatingTabBar({ tabs }: FloatingTabBarProps) {
             <Text 
               style={[
                 styles.label, 
-                { color: active ? colors.green : colors.subtextGray },
-                active && styles.activeLabel
+                { color: active ? colors.green : colors.subtextGray }
               ]}
             >
               {tab.label}
@@ -146,9 +146,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '600',
-  },
-  activeLabel: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'System',
   },
 });

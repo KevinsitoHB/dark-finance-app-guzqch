@@ -32,12 +32,13 @@ export default function TabLayout() {
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '600',
+          fontFamily: 'System',
         },
         headerShown: false,
       }}
     >
       <Tabs.Screen
-        name="(home)"
+        name="index"
         options={{
           title: 'Dashboard',
           tabBarIcon: ({ color }) => ({
@@ -100,6 +101,12 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="profile"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="(home)"
         options={{
           href: null,
         }}

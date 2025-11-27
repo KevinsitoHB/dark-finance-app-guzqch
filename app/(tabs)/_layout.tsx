@@ -8,8 +8,8 @@ export default function TabLayout() {
   // Define the tabs configuration
   const tabs: TabBarItem[] = [
     {
-      name: '(home)',
-      route: '/(tabs)/(home)/',
+      name: 'index',
+      route: '/(tabs)/',
       icon: 'dashboard',
       label: 'Dashboard',
     },
@@ -51,9 +51,9 @@ export default function TabLayout() {
         tabBar={() => null} // Hide default tab bar
       >
         <Tabs.Screen 
-          name="(home)" 
+          name="index" 
           options={{
-            href: '/(tabs)/(home)/',
+            href: '/(tabs)/',
           }}
         />
         <Tabs.Screen 
@@ -88,6 +88,12 @@ export default function TabLayout() {
         />
         <Tabs.Screen 
           name="add-bill"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen 
+          name="(home)"
           options={{
             href: null,
           }}

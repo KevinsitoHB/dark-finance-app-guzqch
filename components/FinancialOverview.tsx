@@ -161,7 +161,7 @@ export default function FinancialOverview({
         <SummaryCard
           backgroundColor="rgba(255, 77, 77, 0.08)"
           borderColor={colors.red}
-          iconName="credit_card"
+          iconName="account_balance"
           iconColor={colors.red}
           value={`$${formatCurrency(totalAccountsDebt)}`}
           valueColor={colors.red}
