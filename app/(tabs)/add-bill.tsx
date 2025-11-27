@@ -210,14 +210,13 @@ export default function AddBillScreen() {
         </View>
       </ScrollView>
 
-      {/* Android Date Picker */}
+      {/* Android Date Picker - Always render when showDatePicker is true */}
       {Platform.OS === 'android' && showDatePicker && (
         <DateTimePicker
           value={dueDate || new Date()}
           mode="date"
-          display="default"
+          display="calendar"
           onChange={handleDateChange}
-          textColor="#FFFFFF"
         />
       )}
 

@@ -108,6 +108,15 @@ export default function PlanningScreen() {
 
   const calculateTotals = (accountsData: Account[]) => {
     try {
+      // If no accounts, set everything to 0
+      if (!accountsData || accountsData.length === 0) {
+        setTotalDebt(0);
+        setTotalAccounts(0);
+        setMonthlyPayments(0);
+        setPayoffYear(0);
+        return;
+      }
+
       const debt = accountsData.reduce((sum, acc) => sum + (acc.current_balance || 0), 0);
       const payments = accountsData.reduce((sum, acc) => sum + (acc.my_monthly_pay || 0), 0);
       
@@ -270,13 +279,13 @@ export default function PlanningScreen() {
               </View>
               <View style={styles.summaryItem}>
                 <Text style={styles.summaryValue}>
-                  {monthlyPayments > 0 ? `$${formatCurrency(monthlyPayments)}` : '$0'}
+                  ${formatCurrency(monthlyPayments)}
                 </Text>
                 <Text style={styles.summaryLabel}>Monthly Payments</Text>
               </View>
               <View style={styles.summaryItem}>
                 <Text style={styles.summaryValue}>
-                  {payoffYear > 0 ? payoffYear : '$0'}
+                  {payoffYear > 0 ? payoffYear : '0'}
                 </Text>
                 <Text style={styles.summaryLabel}>Payoff Year</Text>
               </View>
@@ -331,9 +340,10 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#FFFFFF',
-    fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
+    fontFamily: Platform.OS === 'ios' ? 'System' : 'sans-serif-medium',
+    letterSpacing: 0.5,
   },
 
   // Not Logged In State
