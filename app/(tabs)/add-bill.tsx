@@ -26,7 +26,6 @@ export default function AddBillScreen() {
   const [amount, setAmount] = useState('');
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showCalendarModal, setShowCalendarModal] = useState(false);
 
   const handleSave = async () => {
     try {
@@ -83,13 +82,18 @@ export default function AddBillScreen() {
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
     try {
+      console.log('Date picker event:', event.type, 'Selected date:', selectedDate);
+      
+      // On Android, the picker closes automatically after selection
       if (Platform.OS === 'android') {
         setShowDatePicker(false);
-      }
-      if (selectedDate) {
-        setDueDate(selectedDate);
-        if (Platform.OS === 'ios') {
-          setShowCalendarModal(false);
+        if (event.type === 'set' && selectedDate) {
+          setDueDate(selectedDate);
+        }
+      } else {
+        // On iOS, update the date immediately as user scrolls
+        if (selectedDate) {
+          setDueDate(selectedDate);
         }
       }
     } catch (error) {
@@ -113,13 +117,19 @@ export default function AddBillScreen() {
 
   const openCalendar = () => {
     try {
-      if (Platform.OS === 'ios') {
-        setShowCalendarModal(true);
-      } else {
-        setShowDatePicker(true);
-      }
+      console.log('Opening calendar picker...');
+      setShowDatePicker(true);
     } catch (error) {
       console.error('Error opening calendar:', error);
+    }
+  };
+
+  const closeDatePicker = () => {
+    try {
+      console.log('Closing date picker...');
+      setShowDatePicker(false);
+    } catch (error) {
+      console.error('Error closing date picker:', error);
     }
   };
 
@@ -210,36 +220,31 @@ export default function AddBillScreen() {
         </View>
       </ScrollView>
 
-      {/* Android Date Picker - Always render when showDatePicker is true */}
-      {Platform.OS === 'android' && showDatePicker && (
-        <DateTimePicker
-          value={dueDate || new Date()}
-          mode="date"
-          display="calendar"
-          onChange={handleDateChange}
-        />
-      )}
-
-      {/* iOS Calendar Modal */}
-      {Platform.OS === 'ios' && (
+      {/* Date Picker Modal for iOS */}
+      {Platform.OS === 'ios' && showDatePicker && (
         <Modal
-          visible={showCalendarModal}
+          visible={showDatePicker}
           transparent={true}
           animationType="slide"
-          onRequestClose={() => setShowCalendarModal(false)}
+          onRequestClose={closeDatePicker}
         >
           <View style={styles.modalOverlay}>
+            <TouchableOpacity 
+              style={styles.modalBackdrop} 
+              activeOpacity={1} 
+              onPress={closeDatePicker}
+            />
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <TouchableOpacity
-                  onPress={() => setShowCalendarModal(false)}
+                  onPress={closeDatePicker}
                   hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
                 >
                   <Text style={styles.modalCancelText}>Cancel</Text>
                 </TouchableOpacity>
                 <Text style={styles.modalTitle}>Select Due Date</Text>
                 <TouchableOpacity
-                  onPress={() => setShowCalendarModal(false)}
+                  onPress={closeDatePicker}
                   hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
                 >
                   <Text style={styles.modalDoneText}>Done</Text>
@@ -256,6 +261,16 @@ export default function AddBillScreen() {
             </View>
           </View>
         </Modal>
+      )}
+
+      {/* Date Picker for Android */}
+      {Platform.OS === 'android' && showDatePicker && (
+        <DateTimePicker
+          value={dueDate || new Date()}
+          mode="date"
+          display="calendar"
+          onChange={handleDateChange}
+        />
       )}
     </View>
   );
@@ -403,8 +418,11 @@ const styles = StyleSheet.create({
   // Modal Styles (iOS)
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
   modalContent: {
     backgroundColor: '#1A2F1A',
