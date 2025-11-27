@@ -19,6 +19,13 @@ export const colors = {
   card: '#193cb8',
 };
 
+export const fonts = {
+  regular: 'Roboto_400Regular',
+  medium: 'Roboto_500Medium',
+  bold: 'Roboto_700Bold',
+  black: 'Roboto_900Black',
+};
+
 export const financeTheme = {
   cornerRadius: 20,
   spacing: 8,
@@ -68,6 +75,7 @@ export const commonStyles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '800',
+    fontFamily: fonts.bold,
     textAlign: 'center',
     color: colors.text,
     marginBottom: 10
@@ -75,6 +83,7 @@ export const commonStyles = StyleSheet.create({
   text: {
     fontSize: 16,
     fontWeight: '500',
+    fontFamily: fonts.medium,
     color: colors.text,
     marginBottom: 8,
     lineHeight: 24,

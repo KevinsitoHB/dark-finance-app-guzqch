@@ -15,7 +15,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { colors } from '@/styles/commonStyles';
+import { colors, fonts } from '@/styles/commonStyles';
 import { supabase } from '@/app/integrations/supabase/client';
 
 export default function AddBillScreen() {
@@ -304,6 +304,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: fonts.bold,
     flex: 1,
     textAlign: 'center',
     marginHorizontal: 16,
@@ -322,6 +323,7 @@ const styles = StyleSheet.create({
     color: colors.background,
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: fonts.medium,
   },
 
   // Content
@@ -342,6 +344,7 @@ const styles = StyleSheet.create({
     color: colors.green,
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: fonts.medium,
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: 16,
@@ -355,6 +358,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '500',
+    fontFamily: fonts.medium,
     marginBottom: 8,
   },
   input: {
@@ -366,6 +370,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     color: '#FFFFFF',
     fontSize: 16,
+    fontFamily: fonts.regular,
   },
 
   // Amount Input
@@ -383,6 +388,7 @@ const styles = StyleSheet.create({
     color: colors.green,
     fontSize: 18,
     fontWeight: '600',
+    fontFamily: fonts.medium,
     marginRight: 8,
   },
   amountInput: {
@@ -390,6 +396,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
+    fontFamily: fonts.medium,
     padding: 0,
   },
 
@@ -410,6 +417,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: '#FFFFFF',
     fontSize: 16,
+    fontFamily: fonts.regular,
   },
   dateButtonPlaceholder: {
     color: '#666666',
@@ -443,14 +451,17 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
+    fontFamily: fonts.medium,
   },
   modalCancelText: {
     color: '#888888',
     fontSize: 16,
+    fontFamily: fonts.regular,
   },
   modalDoneText: {
     color: colors.green,
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: fonts.medium,
   },
 });

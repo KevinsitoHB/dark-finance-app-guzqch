@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
   ScrollView
 } from 'react-native';
-import { colors } from '@/styles/commonStyles';
+import { colors, fonts } from '@/styles/commonStyles';
 import CustomHeader from '@/components/CustomHeader';
 import { supabase } from '@/app/integrations/supabase/client';
 
@@ -295,6 +295,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
+    fontFamily: fonts.regular,
     color: colors.subtextGray,
     marginTop: 12,
   },
@@ -316,11 +317,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.subtextGray,
     marginBottom: 24,
     textAlign: 'center',
@@ -328,16 +331,19 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 28,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.green,
     marginBottom: 8,
   },
   emailText: {
     fontSize: 16,
+    fontFamily: fonts.regular,
     color: colors.text,
     marginBottom: 4,
   },
   userIdText: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.subtextGray,
     marginBottom: 24,
   },
@@ -353,11 +359,13 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.green,
     marginBottom: 8,
   },
   infoText: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.subtextGray,
     lineHeight: 20,
   },
@@ -367,6 +375,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: fonts.medium,
     color: colors.text,
     marginBottom: 8,
   },
@@ -377,6 +386,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     fontSize: 16,
+    fontFamily: fonts.regular,
     color: colors.text,
   },
   button: {
@@ -396,6 +406,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.background,
   },
   switchButton: {
@@ -404,6 +415,7 @@ const styles = StyleSheet.create({
   },
   switchButtonText: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.green,
     textAlign: 'center',
   },

@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { IconSymbol } from '@/components/IconSymbol';
-import { colors } from '@/styles/commonStyles';
+import { colors, fonts } from '@/styles/commonStyles';
 
 interface SummaryCardProps {
   backgroundColor: string;
@@ -92,11 +92,13 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 28,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     marginBottom: 8,
     textAlign: 'center',
   },
   subtext: {
     fontSize: 11,
+    fontFamily: fonts.regular,
     color: colors.subtextGray,
     lineHeight: 14,
     textAlign: 'center',

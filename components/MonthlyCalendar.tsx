@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors } from '@/styles/commonStyles';
+import { colors, fonts } from '@/styles/commonStyles';
 
 interface CalendarDay {
   day: number;
@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 16,
   },
@@ -123,6 +124,7 @@ const styles = StyleSheet.create({
   monthTitle: {
     fontSize: 18,
     fontWeight: '600',
+    fontFamily: fonts.medium,
     color: colors.text,
   },
   badge: {
@@ -139,6 +141,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 11,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     textTransform: 'uppercase',
   },
@@ -151,6 +154,7 @@ const styles = StyleSheet.create({
     width: 40,
     textAlign: 'center',
     fontSize: 12,
+    fontFamily: fonts.medium,
     color: '#888',
     fontWeight: '500',
   },
@@ -172,9 +176,11 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 14,
     fontWeight: '500',
+    fontFamily: fonts.medium,
     color: colors.text,
   },
   todayText: {
     fontWeight: '700',
+    fontFamily: fonts.bold,
   },
 });

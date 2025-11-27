@@ -12,7 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '@/styles/commonStyles';
+import { colors, fonts } from '@/styles/commonStyles';
 import { supabase } from '@/app/integrations/supabase/client';
 
 interface CurrencyInputModalProps {
@@ -270,6 +270,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
   },
   content: {
@@ -277,6 +278,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.subtextGray,
     marginBottom: 12,
   },
@@ -287,6 +289,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.subtextGray,
     marginTop: 8,
   },
@@ -303,6 +306,7 @@ const styles = StyleSheet.create({
   currencySymbol: {
     fontSize: 28,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.green,
     marginRight: 8,
   },
@@ -310,6 +314,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 28,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     padding: 0,
   },
@@ -333,6 +338,7 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: fonts.medium,
     color: colors.text,
   },
   saveButton: {
@@ -341,6 +347,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.background,
   },
 });

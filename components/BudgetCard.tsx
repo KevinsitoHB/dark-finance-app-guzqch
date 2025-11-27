@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '@/styles/commonStyles';
+import { colors, fonts } from '@/styles/commonStyles';
 
 interface BudgetCardProps {
   backgroundColor: string;
@@ -64,6 +64,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.subtextGray,
     marginBottom: 8,
     textAlign: 'center',
@@ -71,6 +72,7 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 24,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     textAlign: 'center',
   },
 });

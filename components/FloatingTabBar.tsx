@@ -3,7 +3,7 @@ import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { IconSymbol } from '@/components/IconSymbol';
-import { colors } from '@/styles/commonStyles';
+import { colors, fonts } from '@/styles/commonStyles';
 import { BlurView } from 'expo-blur';
 import { GlassView } from 'expo-glass-effect';
 
@@ -146,6 +146,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '600',
-    fontFamily: 'SpaceMono',
+    fontFamily: fonts.medium,
   },
 });

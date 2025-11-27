@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Platform, ScrollView, ActivityIndicator, Toucha
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import { colors } from '@/styles/commonStyles';
+import { colors, fonts } from '@/styles/commonStyles';
 import { supabase } from '@/app/integrations/supabase/client';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -341,8 +341,8 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: '#FFFFFF',
-    fontFamily: Platform.OS === 'ios' ? 'System' : 'sans-serif-medium',
     letterSpacing: 0.5,
   },
 
@@ -357,12 +357,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 24,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     marginTop: 24,
     marginBottom: 12,
   },
   notLoggedInText: {
     color: '#888888',
     fontSize: 16,
+    fontFamily: fonts.regular,
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 24,
@@ -377,6 +379,7 @@ const styles = StyleSheet.create({
     color: colors.background,
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: fonts.bold,
   },
 
   // Summary Stats
@@ -393,11 +396,13 @@ const styles = StyleSheet.create({
   summaryValue: {
     fontSize: 20,
     fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: '#FFFFFF',
     marginBottom: 4,
   },
   summaryLabel: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: '#A7A7A7',
   },
 
@@ -417,6 +422,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: '#FFFFFF',
     marginBottom: 16,
     paddingHorizontal: 4,
@@ -457,16 +463,19 @@ const styles = StyleSheet.create({
   accountName: {
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: fonts.medium,
     color: '#FFFFFF',
     marginBottom: 2,
   },
   accountType: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: '#FF6B6B',
   },
   accountBalance: {
     fontSize: 22,
     fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: '#FFFFFF',
   },
 
@@ -479,6 +488,7 @@ const styles = StyleSheet.create({
   },
   timeToPayOffLabel: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: '#888888',
     marginBottom: 8,
     textAlign: 'center',
@@ -494,10 +504,12 @@ const styles = StyleSheet.create({
   timeNumber: {
     fontSize: 28,
     fontWeight: 'bold',
+    fontFamily: fonts.bold,
     color: '#FFFFFF',
   },
   timeLabel: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: '#888888',
     marginTop: 2,
   },
@@ -514,11 +526,13 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: '#888888',
   },
   detailValue: {
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: fonts.medium,
     color: '#FFFFFF',
   },
   detailValueHighlight: {
@@ -542,6 +556,7 @@ const styles = StyleSheet.create({
   strategyTitle: {
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: fonts.medium,
     color: '#FFC247',
   },
   strategyContent: {
@@ -552,6 +567,7 @@ const styles = StyleSheet.create({
   strategyText: {
     flex: 1,
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: '#FFFFFF',
     lineHeight: 18,
   },
@@ -565,6 +581,7 @@ const styles = StyleSheet.create({
   loadingText: {
     color: '#888888',
     fontSize: 16,
+    fontFamily: fonts.regular,
     marginTop: 16,
   },
   emptyState: {
@@ -576,12 +593,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
+    fontFamily: fonts.medium,
     marginTop: 16,
     marginBottom: 8,
   },
   emptyStateSubtext: {
     color: '#888888',
     fontSize: 14,
+    fontFamily: fonts.regular,
     textAlign: 'center',
   },
 });

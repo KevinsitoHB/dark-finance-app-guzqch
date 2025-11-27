@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import BudgetCard from './BudgetCard';
-import { colors } from '@/styles/commonStyles';
+import { colors, fonts } from '@/styles/commonStyles';
 import { formatCurrency } from '@/utils/formatters';
 
 interface BudgetBreakdownProps {
@@ -109,6 +109,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 16,
   },
@@ -144,6 +145,7 @@ const styles = StyleSheet.create({
   },
   progressLabel: {
     fontSize: 13,
+    fontFamily: fonts.medium,
     color: colors.subtextGray,
     fontWeight: '500',
   },

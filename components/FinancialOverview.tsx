@@ -5,7 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import SummaryCard from './SummaryCard';
 import CurrencyInputModal from './CurrencyInputModal';
-import { colors } from '@/styles/commonStyles';
+import { colors, fonts } from '@/styles/commonStyles';
 import { supabase } from '@/app/integrations/supabase/client';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.text,
     marginBottom: 16,
   },

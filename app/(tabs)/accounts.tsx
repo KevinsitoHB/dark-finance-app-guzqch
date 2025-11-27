@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Platform, TouchableOpacity, ScrollView, Alert }
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors } from '@/styles/commonStyles';
+import { colors, fonts } from '@/styles/commonStyles';
 import { supabase } from '@/app/integrations/supabase/client';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 28,
     fontWeight: 'bold',
-    fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
+    fontFamily: fonts.bold,
   },
   navbarIcons: {
     flexDirection: 'row',
@@ -316,12 +316,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 24,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     marginTop: 24,
     marginBottom: 12,
   },
   notLoggedInText: {
     color: '#888888',
     fontSize: 16,
+    fontFamily: fonts.regular,
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 24,
@@ -336,6 +338,7 @@ const styles = StyleSheet.create({
     color: colors.background,
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: fonts.bold,
   },
 
   // Account Card Styles
@@ -385,6 +388,7 @@ const styles = StyleSheet.create({
     color: '#888888',
     fontSize: 10,
     fontWeight: '600',
+    fontFamily: fonts.medium,
   },
   accountContent: {
     flex: 1,
@@ -394,11 +398,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: fonts.medium,
     marginBottom: 4,
   },
   accountType: {
     color: '#888888',
     fontSize: 13,
+    fontFamily: fonts.regular,
   },
   accountAmountContainer: {
     alignItems: 'flex-end',
@@ -408,11 +414,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: fonts.bold,
     marginBottom: 2,
   },
   accountLabel: {
     color: '#888888',
     fontSize: 12,
+    fontFamily: fonts.regular,
   },
 
   // Summary Container
@@ -434,16 +442,19 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: fonts.medium,
   },
   summaryAmount: {
     color: colors.green,
     fontSize: 24,
     fontWeight: 'bold',
+    fontFamily: fonts.bold,
   },
   summaryAmountSecondary: {
     color: colors.yellow,
     fontSize: 20,
     fontWeight: 'bold',
+    fontFamily: fonts.bold,
   },
 
   // Empty State
@@ -456,12 +467,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
+    fontFamily: fonts.medium,
     marginTop: 16,
     marginBottom: 8,
   },
   emptyStateSubtext: {
     color: '#888888',
     fontSize: 14,
+    fontFamily: fonts.regular,
     textAlign: 'center',
   },
 
@@ -469,6 +482,7 @@ const styles = StyleSheet.create({
   loadingText: {
     color: '#888888',
     fontSize: 16,
+    fontFamily: fonts.regular,
     textAlign: 'center',
     marginTop: 40,
   },
