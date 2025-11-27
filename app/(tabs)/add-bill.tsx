@@ -26,6 +26,7 @@ export default function AddBillScreen() {
   const [amount, setAmount] = useState('');
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
 
   const handleSave = async () => {
     try {
@@ -82,9 +83,14 @@ export default function AddBillScreen() {
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
     try {
-      setShowDatePicker(Platform.OS === 'ios');
+      if (Platform.OS === 'android') {
+        setShowDatePicker(false);
+      }
       if (selectedDate) {
         setDueDate(selectedDate);
+        if (Platform.OS === 'ios') {
+          setShowCalendarModal(false);
+        }
       }
     } catch (error) {
       console.error('Error in handleDateChange:', error);
@@ -105,6 +111,18 @@ export default function AddBillScreen() {
     }
   };
 
+  const openCalendar = () => {
+    try {
+      if (Platform.OS === 'ios') {
+        setShowCalendarModal(true);
+      } else {
+        setShowDatePicker(true);
+      }
+    } catch (error) {
+      console.error('Error opening calendar:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Top Navbar */}
@@ -120,7 +138,7 @@ export default function AddBillScreen() {
           style={styles.backButton}
           hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
         >
-          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          <Ionicons name="arrow-back" size={24} color={colors.green} />
         </TouchableOpacity>
         <Text style={styles.navbarTitle}>Add New Bill</Text>
         <TouchableOpacity
@@ -130,7 +148,7 @@ export default function AddBillScreen() {
           hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
         >
           {saving ? (
-            <ActivityIndicator size="small" color="#FFFFFF" />
+            <ActivityIndicator size="small" color={colors.background} />
           ) : (
             <Text style={styles.saveButtonText}>Save</Text>
           )}
@@ -180,33 +198,66 @@ export default function AddBillScreen() {
             <Text style={styles.label}>Due Date (Optional)</Text>
             <TouchableOpacity
               style={styles.dateButton}
-              onPress={() => {
-                try {
-                  setShowDatePicker(true);
-                } catch (error) {
-                  console.error('Error showing date picker:', error);
-                }
-              }}
+              onPress={openCalendar}
             >
+              <Ionicons name="calendar-outline" size={20} color={colors.green} />
               <Text style={[styles.dateButtonText, !dueDate && styles.dateButtonPlaceholder]}>
                 {formatDate(dueDate)}
               </Text>
-              <Ionicons name="calendar-outline" size={20} color={colors.green} />
+              <Ionicons name="chevron-forward" size={20} color="#666666" />
             </TouchableOpacity>
           </View>
-
-          {showDatePicker && (
-            <DateTimePicker
-              value={dueDate || new Date()}
-              mode="date"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handleDateChange}
-              textColor="#FFFFFF"
-              themeVariant="dark"
-            />
-          )}
         </View>
       </ScrollView>
+
+      {/* Android Date Picker */}
+      {Platform.OS === 'android' && showDatePicker && (
+        <DateTimePicker
+          value={dueDate || new Date()}
+          mode="date"
+          display="default"
+          onChange={handleDateChange}
+          textColor="#FFFFFF"
+        />
+      )}
+
+      {/* iOS Calendar Modal */}
+      {Platform.OS === 'ios' && (
+        <Modal
+          visible={showCalendarModal}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowCalendarModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <TouchableOpacity
+                  onPress={() => setShowCalendarModal(false)}
+                  hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+                >
+                  <Text style={styles.modalCancelText}>Cancel</Text>
+                </TouchableOpacity>
+                <Text style={styles.modalTitle}>Select Due Date</Text>
+                <TouchableOpacity
+                  onPress={() => setShowCalendarModal(false)}
+                  hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+                >
+                  <Text style={styles.modalDoneText}>Done</Text>
+                </TouchableOpacity>
+              </View>
+              <DateTimePicker
+                value={dueDate || new Date()}
+                mode="date"
+                display="inline"
+                onChange={handleDateChange}
+                textColor="#FFFFFF"
+                themeVariant="dark"
+              />
+            </View>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 }
@@ -227,7 +278,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(46, 255, 139, 0.1)',
+    borderBottomColor: 'rgba(46, 255, 139, 0.2)',
   },
   backButton: {
     minWidth: 32,
@@ -293,9 +344,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: 'rgba(46, 255, 139, 0.05)',
+    backgroundColor: 'rgba(46, 255, 139, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(46, 255, 139, 0.2)',
+    borderColor: 'rgba(46, 255, 139, 0.3)',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -307,9 +358,9 @@ const styles = StyleSheet.create({
   amountInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(46, 255, 139, 0.05)',
+    backgroundColor: 'rgba(46, 255, 139, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(46, 255, 139, 0.2)',
+    borderColor: 'rgba(46, 255, 139, 0.3)',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -333,18 +384,56 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(46, 255, 139, 0.05)',
+    backgroundColor: 'rgba(46, 255, 139, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(46, 255, 139, 0.2)',
+    borderColor: 'rgba(46, 255, 139, 0.3)',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
+    gap: 12,
   },
   dateButtonText: {
+    flex: 1,
     color: '#FFFFFF',
     fontSize: 16,
   },
   dateButtonPlaceholder: {
     color: '#666666',
+  },
+
+  // Modal Styles (iOS)
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#1A2F1A',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: 40,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(46, 255, 139, 0.2)',
+  },
+  modalTitle: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  modalCancelText: {
+    color: '#888888',
+    fontSize: 16,
+  },
+  modalDoneText: {
+    color: colors.green,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

@@ -63,7 +63,13 @@ export default function FloatingTabBar({ tabs }: FloatingTabBarProps) {
               size={24}
               color={active ? colors.green : colors.subtextGray}
             />
-            <Text style={[styles.label, { color: active ? colors.green : colors.subtextGray }]}>
+            <Text 
+              style={[
+                styles.label, 
+                { color: active ? colors.green : colors.subtextGray },
+                active && styles.activeLabel
+              ]}
+            >
               {tab.label}
             </Text>
           </TouchableOpacity>
@@ -140,5 +146,9 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '600',
+  },
+  activeLabel: {
+    fontSize: 24,
+    fontWeight: 'bold',
   },
 });
