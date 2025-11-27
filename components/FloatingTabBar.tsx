@@ -146,6 +146,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '600',
-    fontFamily: 'System',
+    fontFamily: 'SpaceMono',
   },
 });
